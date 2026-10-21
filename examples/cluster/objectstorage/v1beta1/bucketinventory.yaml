@@ -1,0 +1,92 @@
+apiVersion: objectstorage.coreweave.upbound.io/v1beta1
+kind: BucketInventory
+metadata:
+  annotations:
+    meta.upbound.io/example-id: objectstorage/v1beta1/bucketinventory
+  labels:
+    testing.upbound.io/example-name: objectstorage-v1beta1-bucketinventory
+  name: example-bucketinventory
+spec:
+  forProvider:
+    name: example-bucketinventory
+    bucketRef:
+      name: example-bucketinventory-source
+    enabled: true
+    includedObjectVersions: All
+    schedule:
+      frequency: Daily
+    filter:
+      prefix: logs/
+    optionalFields:
+    - Size
+    - LastModifiedDate
+    - StorageClass
+    - ETag
+    destination:
+      bucket:
+        bucketArn: arn:aws:s3:::example-bucketinventory-destination
+        format: CSV
+        prefix: inventory-reports/
+
+---
+
+apiVersion: objectstorage.coreweave.upbound.io/v1beta1
+kind: Bucket
+metadata:
+  annotations:
+    meta.upbound.io/example-id: objectstorage/v1beta1/bucketinventory
+  labels:
+    testing.upbound.io/example-name: objectstorage-v1beta1-bucketinventory
+  name: example-bucketinventory-source
+spec:
+  forProvider:
+    zone: US-EAST-04A
+
+---
+
+apiVersion: objectstorage.coreweave.upbound.io/v1beta1
+kind: Bucket
+metadata:
+  annotations:
+    meta.upbound.io/example-id: objectstorage/v1beta1/bucketinventory
+  labels:
+    testing.upbound.io/example-name: objectstorage-v1beta1-bucketinventory
+  name: example-bucketinventory-destination
+spec:
+  forProvider:
+    zone: US-EAST-04A
+
+---
+
+apiVersion: objectstorage.coreweave.upbound.io/v1beta1
+kind: BucketPolicy
+metadata:
+  annotations:
+    meta.upbound.io/example-id: objectstorage/v1beta1/bucketinventory
+  labels:
+    testing.upbound.io/example-name: objectstorage-v1beta1-bucketinventory
+  name: example-bucketinventory-destination
+spec:
+  forProvider:
+    bucketRef:
+      name: example-bucketinventory-destination
+    policy: |
+      {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Sid": "AllowInventoryReports",
+            "Effect": "Allow",
+            "Principal": {
+              "CW": "arn:aws:iam::static:role/static/inventory"
+            },
+            "Action": [
+              "s3:PutObject",
+              "s3:AbortMultipartUpload"
+            ],
+            "Resource": [
+              "arn:aws:s3:::example-bucketinventory-destination/inventory-reports/*"
+            ]
+          }
+        ]
+      }

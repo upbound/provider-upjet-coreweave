@@ -1,0 +1,287 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.23.0
+  name: accesskeys.objectstorage.coreweave.m.upbound.io
+spec:
+  group: objectstorage.coreweave.m.upbound.io
+  names:
+    categories:
+    - crossplane
+    - managed
+    - coreweave
+    kind: AccessKey
+    listKind: AccessKeyList
+    plural: accesskeys
+    singular: accesskey
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.conditions[?(@.type=='Synced')].status
+      name: SYNCED
+      type: string
+    - jsonPath: .status.conditions[?(@.type=='Ready')].status
+      name: READY
+      type: string
+    - jsonPath: .metadata.annotations.crossplane\.io/external-name
+      name: EXTERNAL-NAME
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: AGE
+      type: date
+    name: v1beta1
+    schema:
+      openAPIV3Schema:
+        description: 'AccessKey is the Schema for the AccessKeys API. Manages one
+          AI Object Storage access key for the authenticated caller. Existing organization
+          policies determine its permissions. Destroy revokes only this key. Set duration_seconds
+          explicitly when creating a key: zero creates a permanent key. Changes to
+          duration or attributes replace the key.example for manual rotation. There
+          is no background renewal; distribute the new secret to consumers before
+          removing an old key, using separate resources when an overlap is needed.
+          Refresh removes missing keys and keys reported as DELETED from state, so
+          the next apply recreates them when a duration is configured. Expired and
+          inactive keys remain managed, with their API status and a warning; they
+          are not automatically rotated or reactivated. If the service later removes
+          an expired key, it is treated as missing. Import uses the key ID. The secret
+          and original duration cannot be recovered and remain null. Omit duration_seconds
+          in the imported resource configuration to keep the existing key; setting
+          it explicitly plans replacement. Omit attributes to adopt the imported values,
+          or configure the same values. Supply an explicit duration before intentionally
+          replacing an imported key. Key creation is sent once without automatic retries.
+          If its response is lost, a key may exist whose ID and secret were not saved;
+          inspect keys using the service tooling before trying again.'
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: AccessKeySpec defines the desired state of AccessKey
+            properties:
+              forProvider:
+                properties:
+                  attributes:
+                    additionalProperties:
+                      type: string
+                    description: |-
+                      63 characters and must not start with cw-, role, or groups. Values must be Kubernetes label values of at most 63 characters (empty allowed). Changes replace the key. Omitted values are adopted during import.
+                      Creation attributes, at most 15 entries. Keys must be lowercase DNS labels of 1-63 characters and must not start with cw-, role, or groups. Values must be Kubernetes label values of at most 63 characters (empty allowed). Changes replace the key. Omitted values are adopted during import.
+                    type: object
+                    x-kubernetes-map-type: granular
+                  durationSeconds:
+                    description: |-
+                      (Number) Required for creation; integer from 0 to 4294967295. Zero means permanent. Omit only when retaining an imported key whose original duration is unavailable. Changing this value replaces the key.
+                      Required for creation; integer from 0 to 4294967295. Zero means permanent. Omit only when retaining an imported key whose original duration is unavailable. Changing this value replaces the key.
+                    type: number
+                type: object
+              initProvider:
+                description: |-
+                  THIS IS A BETA FIELD. It will be honored
+                  unless the Management Policies feature flag is disabled.
+                  InitProvider holds the same fields as ForProvider, with the exception
+                  of Identifier and other resource reference fields. The fields that are
+                  in InitProvider are merged into ForProvider when the resource is created.
+                  The same fields are also added to the terraform ignore_changes hook, to
+                  avoid updating them after creation. This is useful for fields that are
+                  required on creation, but we do not desire to update them after creation,
+                  for example because of an external controller is managing them, like an
+                  autoscaler.
+                properties:
+                  attributes:
+                    additionalProperties:
+                      type: string
+                    description: |-
+                      63 characters and must not start with cw-, role, or groups. Values must be Kubernetes label values of at most 63 characters (empty allowed). Changes replace the key. Omitted values are adopted during import.
+                      Creation attributes, at most 15 entries. Keys must be lowercase DNS labels of 1-63 characters and must not start with cw-, role, or groups. Values must be Kubernetes label values of at most 63 characters (empty allowed). Changes replace the key. Omitted values are adopted during import.
+                    type: object
+                    x-kubernetes-map-type: granular
+                  durationSeconds:
+                    description: |-
+                      (Number) Required for creation; integer from 0 to 4294967295. Zero means permanent. Omit only when retaining an imported key whose original duration is unavailable. Changing this value replaces the key.
+                      Required for creation; integer from 0 to 4294967295. Zero means permanent. Omit only when retaining an imported key whose original duration is unavailable. Changing this value replaces the key.
+                    type: number
+                type: object
+              managementPolicies:
+                default:
+                - '*'
+                description: |-
+                  THIS IS A BETA FIELD. It is on by default but can be opted out
+                  through a Crossplane feature flag.
+                  ManagementPolicies specify the array of actions Crossplane is allowed to
+                  take on the managed and external resources.
+                  See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
+                  and this one: https://github.com/crossplane/crossplane/blob/444267e84783136daa93568b364a5f01228cacbe/design/one-pager-ignore-changes.md
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                  - Observe
+                  - Create
+                  - Update
+                  - Delete
+                  - LateInitialize
+                  - '*'
+                  type: string
+                type: array
+              providerConfigRef:
+                default:
+                  kind: ClusterProviderConfig
+                  name: default
+                description: |-
+                  ProviderConfigReference specifies how the provider that will be used to
+                  create, observe, update, and delete this managed resource should be
+                  configured.
+                properties:
+                  kind:
+                    description: Kind of the referenced object.
+                    type: string
+                  name:
+                    description: Name of the referenced object.
+                    type: string
+                required:
+                - kind
+                - name
+                type: object
+              writeConnectionSecretToRef:
+                description: |-
+                  WriteConnectionSecretToReference specifies the namespace and name of a
+                  Secret to which any connection details for this managed resource should
+                  be written. Connection details frequently include the endpoint, username,
+                  and password required to connect to the managed resource.
+                properties:
+                  name:
+                    description: Name of the secret.
+                    type: string
+                required:
+                - name
+                type: object
+            required:
+            - forProvider
+            type: object
+          status:
+            description: AccessKeyStatus defines the observed state of AccessKey.
+            properties:
+              atProvider:
+                properties:
+                  attributes:
+                    additionalProperties:
+                      type: string
+                    description: |-
+                      63 characters and must not start with cw-, role, or groups. Values must be Kubernetes label values of at most 63 characters (empty allowed). Changes replace the key. Omitted values are adopted during import.
+                      Creation attributes, at most 15 entries. Keys must be lowercase DNS labels of 1-63 characters and must not start with cw-, role, or groups. Values must be Kubernetes label values of at most 63 characters (empty allowed). Changes replace the key. Omitted values are adopted during import.
+                    type: object
+                    x-kubernetes-map-type: granular
+                  durationSeconds:
+                    description: |-
+                      (Number) Required for creation; integer from 0 to 4294967295. Zero means permanent. Omit only when retaining an imported key whose original duration is unavailable. Changing this value replaces the key.
+                      Required for creation; integer from 0 to 4294967295. Zero means permanent. Omit only when retaining an imported key whose original duration is unavailable. Changing this value replaces the key.
+                    type: number
+                  expiry:
+                    description: |-
+                      one API expiry).
+                      Expiry in RFC 3339 UTC format, or null for a permanent key (including an absent or year-one API expiry).
+                    type: string
+                  id:
+                    description: key ID. Used for import and individual revocation.
+                    type: string
+                  orgId:
+                    description: |-
+                      (String) Organization cloud ID reported by the API.
+                      Organization cloud ID reported by the API.
+                    type: string
+                  principalName:
+                    description: |-
+                      (String) Principal determined by the authenticated caller.
+                      Principal determined by the authenticated caller.
+                    type: string
+                  status:
+                    description: |-
+                      only API status, such as ACTIVE, EXPIRED, or FULL_SUSPENDED. The provider never changes principal-wide status.
+                      Read-only API status, such as ACTIVE, EXPIRED, or FULL_SUSPENDED. The provider never changes principal-wide status.
+                    type: string
+                type: object
+              conditions:
+                description: Conditions of the resource.
+                items:
+                  description: A Condition that may apply to a resource.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        LastTransitionTime is the last time this condition transitioned from one
+                        status to another.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        A Message containing details about this condition's last transition from
+                        one status to another, if any.
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        ObservedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      type: integer
+                    reason:
+                      description: A Reason for this condition's last transition from
+                        one status to another.
+                      type: string
+                    status:
+                      description: Status of this condition; is it currently True,
+                        False, or Unknown?
+                      type: string
+                    type:
+                      description: |-
+                        Type of this condition. At most one of each condition type may apply to
+                        a resource at any point in time.
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+                x-kubernetes-list-map-keys:
+                - type
+                x-kubernetes-list-type: map
+              lastHandledReconcileAt:
+                description: |-
+                  LastHandledReconcileAt holds the value of the most recent
+                  reconcile-requested-at annotation token that the controller has
+                  processed. Users can compare this to the annotation to determine
+                  whether a reconcile request has been handled.
+                type: string
+              observedGeneration:
+                description: |-
+                  ObservedGeneration is the latest metadata.generation
+                  which resulted in either a ready state, or stalled due to error
+                  it can not recover from without human intervention.
+                format: int64
+                type: integer
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

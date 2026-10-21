@@ -1,0 +1,21 @@
+apiVersion: objectstorage.coreweave.m.upbound.io/v1beta1
+kind: OrganizationAccessPolicy
+metadata:
+  annotations:
+    meta.upbound.io/example-id: objectstorage/v1beta1/organizationaccesspolicy
+  labels:
+    testing.upbound.io/example-name: test
+  name: test
+  namespace: upbound-system
+spec:
+  forProvider:
+    statements:
+    - actions:
+      - s3:*
+      - cwobject:*
+      effect: Allow
+      name: allow-full-s3-api-access-to-all
+      principals:
+      - '*'
+      resources:
+      - '*'

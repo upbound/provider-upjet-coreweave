@@ -1,0 +1,80 @@
+apiVersion: objectstorage.coreweave.m.upbound.io/v1beta1
+kind: BucketInventory
+metadata:
+  annotations:
+    meta.upbound.io/example-id: objectstorage/v1beta1/bucketinventory
+  labels:
+    testing.upbound.io/example-name: default
+  name: default
+  namespace: upbound-system
+spec:
+  forProvider:
+    bucketSelector:
+      matchLabels:
+        testing.upbound.io/example-name: source
+    destination:
+    - bucket:
+      - bucketArn: arn:aws:s3:::${coreweave_object_storage_bucket.destination.name}
+        format: CSV
+        prefix: inventory-reports/
+    enabled: true
+    filter:
+    - prefix: logs/
+    includedObjectVersions: All
+    name: daily-inventory
+    optionalFields:
+    - Size
+    - LastModifiedDate
+    - LastAccessedDate
+    - StorageClass
+    - ETag
+    schedule:
+    - frequency: Daily
+
+---
+
+apiVersion: objectstorage.coreweave.m.upbound.io/v1beta1
+kind: Bucket
+metadata:
+  annotations:
+    meta.upbound.io/example-id: objectstorage/v1beta1/bucketinventory
+  labels:
+    testing.upbound.io/example-name: destination
+  name: destination
+  namespace: upbound-system
+spec:
+  forProvider:
+    zone: US-EAST-04A
+
+---
+
+apiVersion: objectstorage.coreweave.m.upbound.io/v1beta1
+kind: Bucket
+metadata:
+  annotations:
+    meta.upbound.io/example-id: objectstorage/v1beta1/bucketinventory
+  labels:
+    testing.upbound.io/example-name: source
+  name: source
+  namespace: upbound-system
+spec:
+  forProvider:
+    zone: US-EAST-04A
+
+---
+
+apiVersion: objectstorage.coreweave.m.upbound.io/v1beta1
+kind: BucketPolicy
+metadata:
+  annotations:
+    meta.upbound.io/example-id: objectstorage/v1beta1/bucketinventory
+  labels:
+    testing.upbound.io/example-name: inventory_destination
+  name: inventory-destination
+  namespace: upbound-system
+spec:
+  forProvider:
+    bucketSelector:
+      matchLabels:
+        testing.upbound.io/example-name: destination
+    policy: inventory-destination-example

@@ -6,9 +6,11 @@ package cluster
 
 import (
 	"github.com/upbound/provider-coreweave/config/cluster/cks"
+	"github.com/upbound/provider-coreweave/config/cluster/objectstorage"
 )
 
 // Keep this list identical to config/namespaced/provider.go.
 func init() {
 	ProviderConfiguration.AddConfig(cks.Configure)
+	ProviderConfiguration.AddConfig(objectstorage.Configure)
 }

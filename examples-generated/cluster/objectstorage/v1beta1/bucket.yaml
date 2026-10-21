@@ -1,0 +1,13 @@
+apiVersion: objectstorage.coreweave.upbound.io/v1beta1
+kind: Bucket
+metadata:
+  annotations:
+    meta.upbound.io/example-id: objectstorage/v1beta1/bucket
+  labels:
+    testing.upbound.io/example-name: default
+  name: default
+spec:
+  forProvider:
+    tags:
+      foo: bar
+    zone: US-EAST-04A

@@ -12,6 +12,7 @@ import (
 
 	v1beta1 "github.com/upbound/provider-coreweave/apis/cluster/cks/v1beta1"
 	v1beta1networking "github.com/upbound/provider-coreweave/apis/cluster/networking/v1beta1"
+	v1beta1objectstorage "github.com/upbound/provider-coreweave/apis/cluster/objectstorage/v1beta1"
 	v1alpha1 "github.com/upbound/provider-coreweave/apis/cluster/v1alpha1"
 	v1beta1cluster "github.com/upbound/provider-coreweave/apis/cluster/v1beta1"
 )
@@ -21,6 +22,7 @@ func init() {
 	AddToSchemes = append(AddToSchemes,
 		v1beta1.SchemeBuilder.AddToScheme,
 		v1beta1networking.SchemeBuilder.AddToScheme,
+		v1beta1objectstorage.SchemeBuilder.AddToScheme,
 		v1alpha1.SchemeBuilder.AddToScheme,
 		v1beta1cluster.SchemeBuilder.AddToScheme,
 	)

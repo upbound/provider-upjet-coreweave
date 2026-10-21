@@ -1,4 +1,12 @@
 [
 "coreweave_cks_cluster",
-"coreweave_networking_vpc"
+"coreweave_networking_vpc",
+"coreweave_object_storage_access_key",
+"coreweave_object_storage_bucket",
+"coreweave_object_storage_bucket_inventory",
+"coreweave_object_storage_bucket_lifecycle_configuration",
+"coreweave_object_storage_bucket_policy",
+"coreweave_object_storage_bucket_settings",
+"coreweave_object_storage_bucket_versioning",
+"coreweave_object_storage_organization_access_policy"
 ]

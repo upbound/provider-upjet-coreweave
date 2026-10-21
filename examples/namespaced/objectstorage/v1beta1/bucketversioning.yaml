@@ -1,0 +1,31 @@
+apiVersion: objectstorage.coreweave.m.upbound.io/v1beta1
+kind: BucketVersioning
+metadata:
+  annotations:
+    meta.upbound.io/example-id: objectstorage/v1beta1/bucketversioning
+  labels:
+    testing.upbound.io/example-name: objectstorage-v1beta1-bucketversioning
+  name: example-bucketversioning
+  namespace: upbound-system
+spec:
+  forProvider:
+    bucketSelector:
+      matchLabels:
+        testing.upbound.io/example-name: objectstorage-v1beta1-bucketversioning
+    versioningConfiguration:
+      status: Enabled
+
+---
+
+apiVersion: objectstorage.coreweave.m.upbound.io/v1beta1
+kind: Bucket
+metadata:
+  annotations:
+    meta.upbound.io/example-id: objectstorage/v1beta1/bucketversioning
+  labels:
+    testing.upbound.io/example-name: objectstorage-v1beta1-bucketversioning
+  name: example-bucketversioning
+  namespace: upbound-system
+spec:
+  forProvider:
+    zone: US-EAST-04A
