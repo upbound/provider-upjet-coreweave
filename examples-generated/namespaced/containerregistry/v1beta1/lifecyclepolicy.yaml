@@ -1,0 +1,36 @@
+apiVersion: containerregistry.coreweave.m.upbound.io/v1beta1
+kind: LifecyclePolicy
+metadata:
+  annotations:
+    meta.upbound.io/example-id: containerregistry/v1beta1/lifecyclepolicy
+  labels:
+    testing.upbound.io/example-name: images
+  name: images
+  namespace: upbound-system
+spec:
+  forProvider:
+    enabled: true
+    namespaceSelector:
+      matchLabels:
+        testing.upbound.io/example-name: images
+    rules:
+      expire-ci:
+        keep_newest: 10
+        older_than: 2592000s
+        regex: ci/.*
+
+---
+
+apiVersion: containerregistry.coreweave.m.upbound.io/v1beta1
+kind: Namespace
+metadata:
+  annotations:
+    meta.upbound.io/example-id: containerregistry/v1beta1/lifecyclepolicy
+  labels:
+    testing.upbound.io/example-name: images
+  name: images
+  namespace: upbound-system
+spec:
+  forProvider:
+    forceDestroy: false
+    zone: US-LAB-01A

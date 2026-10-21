@@ -11,6 +11,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 
 	v1beta1 "github.com/upbound/provider-coreweave/apis/cluster/cks/v1beta1"
+	v1beta1containerregistry "github.com/upbound/provider-coreweave/apis/cluster/containerregistry/v1beta1"
 	v1beta1inference "github.com/upbound/provider-coreweave/apis/cluster/inference/v1beta1"
 	v1beta1networking "github.com/upbound/provider-coreweave/apis/cluster/networking/v1beta1"
 	v1beta1objectstorage "github.com/upbound/provider-coreweave/apis/cluster/objectstorage/v1beta1"
@@ -23,6 +24,7 @@ func init() {
 	// Register the types with the Scheme so the components can map objects to GroupVersionKinds and back
 	AddToSchemes = append(AddToSchemes,
 		v1beta1.SchemeBuilder.AddToScheme,
+		v1beta1containerregistry.SchemeBuilder.AddToScheme,
 		v1beta1inference.SchemeBuilder.AddToScheme,
 		v1beta1networking.SchemeBuilder.AddToScheme,
 		v1beta1objectstorage.SchemeBuilder.AddToScheme,

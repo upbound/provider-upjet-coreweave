@@ -49,6 +49,14 @@ var terraformPluginFrameworkExternalNameConfigs = map[string]config.ExternalName
 	"coreweave_inference_deployment":                          config.FrameworkResourceWithComputedIdentifier("id", nilUUID),
 	"coreweave_inference_gateway":                             config.FrameworkResourceWithComputedIdentifier("id", nilUUID),
 	"coreweave_workload_federation_oidc_config":               config.FrameworkResourceWithComputedIdentifier("id", nilUUID),
+	// Container registry ids are canonical API resource names derived from the
+	// namespace name: namespaces/<name>, with a fixed suffix for the two
+	// per-namespace singletons. The namespace is identified by its name; the
+	// singletons keep namespace as a referenceable argument and take the
+	// canonical name as external name after the first read.
+	"coreweave_container_registry_namespace":            config.TemplatedStringAsIdentifier("name", "namespaces/{{ .external_name }}"),
+	"coreweave_container_registry_access_configuration": config.FrameworkResourceWithComputedIdentifier("id", "namespaces/placeholder/accessConfiguration"),
+	"coreweave_container_registry_lifecycle_policy":     config.FrameworkResourceWithComputedIdentifier("id", "namespaces/placeholder/lifecyclePolicy"),
 }
 
 // frameworkNameAsIdentifier identifies a framework resource that has no id
