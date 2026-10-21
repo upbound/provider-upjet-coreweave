@@ -1,0 +1,36 @@
+apiVersion: containerregistry.coreweave.m.upbound.io/v1beta1
+kind: LifecyclePolicy
+metadata:
+  annotations:
+    meta.upbound.io/example-id: containerregistry/v1beta1/lifecyclepolicy
+  labels:
+    testing.upbound.io/example-name: containerregistry-v1beta1-lifecyclepolicy
+  name: example-lifecyclepolicy
+  namespace: upbound-system
+spec:
+  forProvider:
+    namespaceSelector:
+      matchLabels:
+        testing.upbound.io/example-name: containerregistry-v1beta1-lifecyclepolicy
+    enabled: true
+    rules:
+      expire-ci:
+        regex: ci/.*
+        olderThan: 2592000s
+        keepNewest: 10
+
+---
+
+apiVersion: containerregistry.coreweave.m.upbound.io/v1beta1
+kind: Namespace
+metadata:
+  annotations:
+    meta.upbound.io/example-id: containerregistry/v1beta1/lifecyclepolicy
+  labels:
+    testing.upbound.io/example-name: containerregistry-v1beta1-lifecyclepolicy
+  name: example-lifecyclepolicy
+  namespace: upbound-system
+spec:
+  forProvider:
+    zone: US-LAB-01A
+    forceDestroy: false

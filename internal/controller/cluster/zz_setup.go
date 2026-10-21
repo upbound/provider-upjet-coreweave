@@ -10,6 +10,9 @@ import (
 	"github.com/crossplane/upjet/v2/pkg/controller"
 
 	cluster "github.com/upbound/provider-coreweave/internal/controller/cluster/cks/cluster"
+	accessconfiguration "github.com/upbound/provider-coreweave/internal/controller/cluster/containerregistry/accessconfiguration"
+	lifecyclepolicy "github.com/upbound/provider-coreweave/internal/controller/cluster/containerregistry/lifecyclepolicy"
+	namespace "github.com/upbound/provider-coreweave/internal/controller/cluster/containerregistry/namespace"
 	capacityclaim "github.com/upbound/provider-coreweave/internal/controller/cluster/inference/capacityclaim"
 	deployment "github.com/upbound/provider-coreweave/internal/controller/cluster/inference/deployment"
 	gateway "github.com/upbound/provider-coreweave/internal/controller/cluster/inference/gateway"
@@ -31,6 +34,9 @@ import (
 func Setup(mgr ctrl.Manager, o controller.Options) error {
 	for _, setup := range []func(ctrl.Manager, controller.Options) error{
 		cluster.Setup,
+		accessconfiguration.Setup,
+		lifecyclepolicy.Setup,
+		namespace.Setup,
 		capacityclaim.Setup,
 		deployment.Setup,
 		gateway.Setup,
@@ -58,6 +64,9 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 func SetupGated(mgr ctrl.Manager, o controller.Options) error {
 	for _, setup := range []func(ctrl.Manager, controller.Options) error{
 		cluster.SetupGated,
+		accessconfiguration.SetupGated,
+		lifecyclepolicy.SetupGated,
+		namespace.SetupGated,
 		capacityclaim.SetupGated,
 		deployment.SetupGated,
 		gateway.SetupGated,
@@ -84,6 +93,9 @@ func SetupGated(mgr ctrl.Manager, o controller.Options) error {
 func SetupWebhookWithManager(mgr ctrl.Manager) error {
 	for _, setup := range []func(ctrl.Manager) error{
 		cluster.SetupWebhookWithManager,
+		accessconfiguration.SetupWebhookWithManager,
+		lifecyclepolicy.SetupWebhookWithManager,
+		namespace.SetupWebhookWithManager,
 		capacityclaim.SetupWebhookWithManager,
 		deployment.SetupWebhookWithManager,
 		gateway.SetupWebhookWithManager,

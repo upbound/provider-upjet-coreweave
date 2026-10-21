@@ -1,0 +1,42 @@
+apiVersion: containerregistry.coreweave.m.upbound.io/v1beta1
+kind: AccessConfiguration
+metadata:
+  annotations:
+    meta.upbound.io/example-id: containerregistry/v1beta1/accessconfiguration
+  labels:
+    testing.upbound.io/example-name: containerregistry-v1beta1-accessconfiguration
+  name: example-accessconfiguration
+  namespace: upbound-system
+spec:
+  forProvider:
+    namespaceSelector:
+      matchLabels:
+        testing.upbound.io/example-name: containerregistry-v1beta1-accessconfiguration
+    policySets:
+      readers:
+        identitySelector: COREWEAVE
+        rules:
+          pull:
+            expression: 'identity["org_id"] == "example-org" && "read_registry_content" in identity["roles"] && request["type"] == "repository" && request["action"] == "pull"'
+    requestIpAcl:
+      allowCidrs:
+      - 192.0.2.0/24
+      - 2001:db8::/32
+      denyCidrs:
+      - 192.0.2.128/25
+
+---
+
+apiVersion: containerregistry.coreweave.m.upbound.io/v1beta1
+kind: Namespace
+metadata:
+  annotations:
+    meta.upbound.io/example-id: containerregistry/v1beta1/accessconfiguration
+  labels:
+    testing.upbound.io/example-name: containerregistry-v1beta1-accessconfiguration
+  name: example-accessconfiguration
+  namespace: upbound-system
+spec:
+  forProvider:
+    zone: US-LAB-01A
+    initialAccessConfiguration: {}

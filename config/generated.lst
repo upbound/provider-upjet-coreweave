@@ -1,5 +1,8 @@
 [
 "coreweave_cks_cluster",
+"coreweave_container_registry_access_configuration",
+"coreweave_container_registry_lifecycle_policy",
+"coreweave_container_registry_namespace",
 "coreweave_inference_capacity_claim",
 "coreweave_inference_deployment",
 "coreweave_inference_gateway",
