@@ -1,0 +1,11 @@
+apiVersion: coreweave.m.upbound.io/v1beta1
+kind: ClusterProviderConfig
+metadata:
+  name: default
+spec:
+  credentials:
+    source: Secret
+    secretRef:
+      name: example-creds
+      namespace: upbound-system
+      key: credentials
