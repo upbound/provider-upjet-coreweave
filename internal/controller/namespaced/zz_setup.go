@@ -9,6 +9,7 @@ import (
 
 	"github.com/crossplane/upjet/v2/pkg/controller"
 
+	cluster "github.com/upbound/provider-coreweave/internal/controller/namespaced/cks/cluster"
 	vpc "github.com/upbound/provider-coreweave/internal/controller/namespaced/networking/vpc"
 	providerconfig "github.com/upbound/provider-coreweave/internal/controller/namespaced/providerconfig"
 )
@@ -17,6 +18,7 @@ import (
 // the supplied manager.
 func Setup(mgr ctrl.Manager, o controller.Options) error {
 	for _, setup := range []func(ctrl.Manager, controller.Options) error{
+		cluster.Setup,
 		vpc.Setup,
 		providerconfig.Setup,
 	} {
@@ -31,6 +33,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 // the supplied manager gated.
 func SetupGated(mgr ctrl.Manager, o controller.Options) error {
 	for _, setup := range []func(ctrl.Manager, controller.Options) error{
+		cluster.SetupGated,
 		vpc.SetupGated,
 		providerconfig.SetupGated,
 	} {
@@ -44,6 +47,7 @@ func SetupGated(mgr ctrl.Manager, o controller.Options) error {
 // SetupWebhookWithManager registers conversion webhooks for all resource kinds in the group.
 func SetupWebhookWithManager(mgr ctrl.Manager) error {
 	for _, setup := range []func(ctrl.Manager) error{
+		cluster.SetupWebhookWithManager,
 		vpc.SetupWebhookWithManager,
 		providerconfig.SetupWebhookWithManager,
 	} {

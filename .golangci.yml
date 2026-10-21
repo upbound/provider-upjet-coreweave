@@ -90,6 +90,9 @@ linters:
           - unparam
         path: _test(ing)?\.go
       - linters:
+          - goconst
+        path: ^config/
+      - linters:
           - gocritic
         path: _test\.go
         text: (unnamedResult|exitAfterDefer)

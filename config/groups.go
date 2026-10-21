@@ -47,4 +47,5 @@ func KnownGroupKind(group, kind string) GroupKindCalculator {
 // resource prefix and the kind from the rest.
 var GroupMap = map[string]GroupKindCalculator{
 	"coreweave_networking_vpc": KnownGroupKind("networking", "VPC"),
+	"coreweave_cks_cluster":    ReplaceGroupWords("cks", 1),
 }

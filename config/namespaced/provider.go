@@ -4,13 +4,11 @@
 
 package namespaced
 
-// Register one Configure function per API group package, for example:
-//
-//	import "github.com/upbound/provider-coreweave/config/namespaced/vpc"
-//
-//	func init() {
-//		ProviderConfiguration.AddConfig(vpc.Configure)
-//	}
-//
+import (
+	"github.com/upbound/provider-coreweave/config/namespaced/cks"
+)
+
 // Keep this list identical to config/cluster/provider.go.
-func init() {}
+func init() {
+	ProviderConfiguration.AddConfig(cks.Configure)
+}
