@@ -191,6 +191,32 @@ After editing config, run `make generate`, then curate `examples/`.
   `token` key; the remaining provider block arguments are ProviderConfig spec
   fields, both mapped in `internal/clients/coreweave.go`.
 
+## Offline diff server
+
+`provider internal diff-server [--network tcp|unix] [--address :9099]` serves
+upjet's diff gRPC service (`proto/diff/v1alpha1`, `pkg/diffserver`) and is what
+the Crossplane CLI runs to simulate changes. `start` is the default command, so
+the image keeps its behaviour when invoked without arguments. The server never
+contacts the CoreWeave API or a cluster:
+
+- It is dispatched before `ctrl.GetConfig()` in `cmd/provider/main.go`, so no
+  kubeconfig is needed; ProviderConfigs come from each request's object store.
+- `internal/clients/offline.go` replaces the Terraform setup: the ProviderConfig
+  is resolved (endpoints and timeout honoured, credentials never read) and the
+  upstream provider is wrapped so that its `Configure` never runs. The wrapper
+  builds the `*coreweave.Client` itself, through the upstream constructor's
+  interceptor hook, with an interceptor that refuses every RPC as
+  `DIFF_COMPUTATION_NOT_SUPPORTED` and a token source that refuses to mint a
+  token. The `COREWEAVE_*` environment variables are therefore never consulted.
+- A resource whose plan needs the API (the inference Deployment validates its
+  engine against the API in `ModifyPlan`) fails with `FailedPrecondition`
+  instead of reaching out. Every other resource plans offline.
+- `cmd/provider/diffserver_test.go` drives the real server over a unix socket;
+  `internal/clients/offline_test.go` proves no request reaches the process's
+  network boundary with an `HTTPS_PROXY` tripwire and a positive control.
+- `resolveModern` clears the namespace for a `ClusterProviderConfig`: the
+  server's in-memory store keys objects on the exact namespace.
+
 ## E2E testing
 
 `make uptest` / `make e2e` drive examples through a live control plane.

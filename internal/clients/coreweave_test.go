@@ -1,11 +1,16 @@
 package clients
 
 import (
+	"context"
 	"testing"
 
+	rtfake "github.com/crossplane/crossplane-runtime/v2/pkg/resource/fake"
 	xpv2 "github.com/crossplane/crossplane/apis/v2/core/v2"
 	"github.com/google/go-cmp/cmp"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/utils/ptr"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	namespacedv1beta1 "github.com/upbound/provider-coreweave/apis/namespaced/v1beta1"
 )
@@ -115,8 +120,9 @@ func TestResolveNamespacedSpec(t *testing.T) {
 }
 
 const (
-	exampleToken     = "CW-SECRET-example"
-	exampleNamespace = "team-a"
+	exampleToken              = "CW-SECRET-example"
+	exampleNamespace          = "team-a"
+	defaultProviderConfigName = "default"
 )
 
 func TestBuildConfiguration(t *testing.T) {
@@ -184,6 +190,71 @@ func TestBuildConfiguration(t *testing.T) {
 			}
 			if diff := cmp.Diff(tc.want, got); diff != "" {
 				t.Errorf("buildConfiguration() mismatch (-want +got):\n%s", diff)
+			}
+		})
+	}
+}
+
+// TestResolveModern asserts that a namespaced managed resource resolves a
+// ClusterProviderConfig without its own namespace, and a ProviderConfig from
+// its own namespace. The fake client keys objects on their exact namespace,
+// like the diff server's in-memory store, so the first case fails without
+// the fix in resolveModern.
+func TestResolveModern(t *testing.T) {
+	const (
+		clusterEndpoint    = "https://cluster.api.example.test/"
+		namespacedEndpoint = "https://team-a.api.example.test/"
+	)
+	scheme := runtime.NewScheme()
+	if err := namespacedv1beta1.SchemeBuilder.AddToScheme(scheme); err != nil {
+		t.Fatalf("cannot build the test scheme: %v", err)
+	}
+
+	type want struct {
+		endpoint string
+		err      bool
+	}
+	cases := map[string]struct {
+		kind string
+		want want
+	}{
+		"ClusterProviderConfigFromNamespacedResource": {
+			kind: namespacedv1beta1.ClusterProviderConfigKind,
+			want: want{endpoint: clusterEndpoint},
+		},
+		"ProviderConfigFromOwnNamespace": {
+			kind: namespacedv1beta1.ProviderConfigKind,
+			want: want{endpoint: namespacedEndpoint},
+		},
+		"UnknownKind": {
+			kind: "NoSuchProviderConfig",
+			want: want{err: true},
+		},
+	}
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			kc := fake.NewClientBuilder().WithScheme(scheme).WithObjects(
+				&namespacedv1beta1.ClusterProviderConfig{
+					ObjectMeta: metav1.ObjectMeta{Name: defaultProviderConfigName},
+					Spec:       namespacedv1beta1.ProviderConfigSpec{Endpoint: ptr.To(clusterEndpoint)},
+				},
+				&namespacedv1beta1.ProviderConfig{
+					ObjectMeta: metav1.ObjectMeta{Name: defaultProviderConfigName, Namespace: exampleNamespace},
+					Spec:       namespacedv1beta1.NamespacedProviderConfigSpec{Endpoint: ptr.To(namespacedEndpoint)},
+				},
+			).Build()
+			mg := &rtfake.ModernManaged{ObjectMeta: metav1.ObjectMeta{Name: "example", Namespace: exampleNamespace, UID: "test-uid"}}
+			mg.SetProviderConfigReference(&xpv2.ProviderConfigReference{Kind: tc.kind, Name: defaultProviderConfigName})
+
+			got, err := resolveModern(context.Background(), kc, mg)
+			if (err != nil) != tc.want.err {
+				t.Fatalf("resolveModern() error = %v, wantErr %v", err, tc.want.err)
+			}
+			if err != nil {
+				return
+			}
+			if diff := cmp.Diff(tc.want.endpoint, ptr.Deref(got.Endpoint, "")); diff != "" {
+				t.Errorf("resolveModern() resolved the wrong ProviderConfig (-want +got):\n%s", diff)
 			}
 		})
 	}

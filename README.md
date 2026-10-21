@@ -25,6 +25,11 @@ make run        # run the provider out-of-cluster against the current kubeconfig
 make e2e        # deploy to a kind cluster and run the uptest end-to-end tests
 ```
 
+The binary also serves upjet's diff gRPC service for the Crossplane CLI with
+`provider internal diff-server`; it computes plans offline and never contacts
+the CoreWeave API or a cluster. See [CLAUDE.md](CLAUDE.md) for how it is kept
+offline.
+
 See [CLAUDE.md](CLAUDE.md) for the repository layout and the steps to add a resource.
 
 The upstream Terraform provider does not export its constructor yet, so the Go
