@@ -48,6 +48,7 @@ var terraformPluginFrameworkExternalNameConfigs = map[string]config.ExternalName
 	"coreweave_inference_capacity_claim":                      config.FrameworkResourceWithComputedIdentifier("id", nilUUID),
 	"coreweave_inference_deployment":                          config.FrameworkResourceWithComputedIdentifier("id", nilUUID),
 	"coreweave_inference_gateway":                             config.FrameworkResourceWithComputedIdentifier("id", nilUUID),
+	"coreweave_workload_federation_oidc_config":               config.FrameworkResourceWithComputedIdentifier("id", nilUUID),
 }
 
 // frameworkNameAsIdentifier identifies a framework resource that has no id

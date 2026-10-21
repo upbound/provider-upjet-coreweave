@@ -11,5 +11,6 @@
 "coreweave_object_storage_bucket_policy",
 "coreweave_object_storage_bucket_settings",
 "coreweave_object_storage_bucket_versioning",
-"coreweave_object_storage_organization_access_policy"
+"coreweave_object_storage_organization_access_policy",
+"coreweave_workload_federation_oidc_config"
 ]

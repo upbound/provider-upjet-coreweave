@@ -23,6 +23,7 @@ import (
 	bucketversioning "github.com/upbound/provider-coreweave/internal/controller/namespaced/objectstorage/bucketversioning"
 	organizationaccesspolicy "github.com/upbound/provider-coreweave/internal/controller/namespaced/objectstorage/organizationaccesspolicy"
 	providerconfig "github.com/upbound/provider-coreweave/internal/controller/namespaced/providerconfig"
+	oidcconfig "github.com/upbound/provider-coreweave/internal/controller/namespaced/workloadfederation/oidcconfig"
 )
 
 // Setup creates all controllers with the supplied logger and adds them to
@@ -43,6 +44,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 		bucketversioning.Setup,
 		organizationaccesspolicy.Setup,
 		providerconfig.Setup,
+		oidcconfig.Setup,
 	} {
 		if err := setup(mgr, o); err != nil {
 			return err
@@ -69,6 +71,7 @@ func SetupGated(mgr ctrl.Manager, o controller.Options) error {
 		bucketversioning.SetupGated,
 		organizationaccesspolicy.SetupGated,
 		providerconfig.SetupGated,
+		oidcconfig.SetupGated,
 	} {
 		if err := setup(mgr, o); err != nil {
 			return err
@@ -94,6 +97,7 @@ func SetupWebhookWithManager(mgr ctrl.Manager) error {
 		bucketversioning.SetupWebhookWithManager,
 		organizationaccesspolicy.SetupWebhookWithManager,
 		providerconfig.SetupWebhookWithManager,
+		oidcconfig.SetupWebhookWithManager,
 	} {
 		if err := setup(mgr); err != nil {
 			return err
