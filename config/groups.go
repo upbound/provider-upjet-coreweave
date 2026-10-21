@@ -59,4 +59,5 @@ var GroupMap = map[string]GroupKindCalculator{
 	"coreweave_inference_capacity_claim":                      ReplaceGroupWords("inference", 1),
 	"coreweave_inference_deployment":                          ReplaceGroupWords("inference", 1),
 	"coreweave_inference_gateway":                             ReplaceGroupWords("inference", 1),
+	"coreweave_workload_federation_oidc_config":               KnownGroupKind("workloadfederation", "OIDCConfig"),
 }

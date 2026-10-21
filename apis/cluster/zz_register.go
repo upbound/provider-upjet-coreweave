@@ -16,6 +16,7 @@ import (
 	v1beta1objectstorage "github.com/upbound/provider-coreweave/apis/cluster/objectstorage/v1beta1"
 	v1alpha1 "github.com/upbound/provider-coreweave/apis/cluster/v1alpha1"
 	v1beta1cluster "github.com/upbound/provider-coreweave/apis/cluster/v1beta1"
+	v1beta1workloadfederation "github.com/upbound/provider-coreweave/apis/cluster/workloadfederation/v1beta1"
 )
 
 func init() {
@@ -27,6 +28,7 @@ func init() {
 		v1beta1objectstorage.SchemeBuilder.AddToScheme,
 		v1alpha1.SchemeBuilder.AddToScheme,
 		v1beta1cluster.SchemeBuilder.AddToScheme,
+		v1beta1workloadfederation.SchemeBuilder.AddToScheme,
 	)
 }
 
