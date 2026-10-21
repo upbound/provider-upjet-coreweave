@@ -10,6 +10,10 @@ import (
 	"github.com/crossplane/upjet/v2/pkg/config"
 )
 
+// nilUUID stands in for a server-assigned UUID identifier until the resource
+// exists; the CoreWeave API answers not-found for it.
+const nilUUID = "00000000-0000-0000-0000-000000000000"
+
 // terraformPluginSDKExternalNameConfigs contains the external name
 // configuration of every resource the upstream provider implements with
 // terraform-plugin-sdk/v2, keyed by Terraform resource name. Listing a
@@ -24,7 +28,8 @@ var terraformPluginSDKExternalNameConfigs = map[string]config.ExternalName{
 // A resource must appear in at most one of the two maps.
 var terraformPluginFrameworkExternalNameConfigs = map[string]config.ExternalName{
 	// VPC ids are server-assigned UUIDs.
-	"coreweave_networking_vpc": config.FrameworkResourceWithComputedIdentifier("id", "00000000-0000-0000-0000-000000000000"),
+	"coreweave_networking_vpc": config.FrameworkResourceWithComputedIdentifier("id", nilUUID),
+	"coreweave_cks_cluster":    config.FrameworkResourceWithComputedIdentifier("id", nilUUID),
 }
 
 // ExternalNameConfigurations applies all external name configs listed in the

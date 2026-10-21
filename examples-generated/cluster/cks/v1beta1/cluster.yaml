@@ -1,0 +1,67 @@
+apiVersion: cks.coreweave.upbound.io/v1beta1
+kind: Cluster
+metadata:
+  annotations:
+    meta.upbound.io/example-id: cks/v1beta1/cluster
+  labels:
+    testing.upbound.io/example-name: default
+  name: default
+spec:
+  forProvider:
+    auditPolicy: ${filebase64("${path.module}/audit-policy.yaml")}
+    authnWebhook:
+      ca: ${filebase64("${path.module}/example-ca.crt")}
+      server: https://samples.auth0.com/
+    authzWebhook:
+      ca: ${filebase64("${path.module}/example-ca.crt")}
+      server: https://samples.auth0.com/
+    internalLbCidrNames:
+    - internal lb cidr
+    kubelet: ${jsonencode({ maxPods = 256 })}
+    name: default
+    oidc:
+      ca: ${filebase64("${path.module}/example-ca.crt")}
+      clientId: kbyuFDidLLm280LIwVFiazOqjO3ty8KH
+      groupsClaim: read-only
+      groupsPrefix: cw
+      issuerUrl: https://samples.auth0.com/
+      requiredClaim: ""
+      signingAlgs:
+      - SIGNING_ALGORITHM_RS256
+      usernameClaim: user_id
+      usernamePrefix: cw
+    podCidrName: pod cidr
+    public: false
+    serviceCidrName: service cidr
+    version: v1.35
+    vpcIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: default
+    zone: US-EAST-04A
+
+---
+
+apiVersion: networking.coreweave.upbound.io/v1beta1
+kind: VPC
+metadata:
+  annotations:
+    meta.upbound.io/example-id: cks/v1beta1/cluster
+  labels:
+    testing.upbound.io/example-name: default
+  name: default
+spec:
+  forProvider:
+    hostPrefixes:
+    - name: primary
+      prefixes:
+      - 10.16.192.0/18
+      type: PRIMARY
+    name: default
+    vpcPrefixes:
+    - name: pod cidr
+      value: 10.0.0.0/13
+    - name: service cidr
+      value: 10.16.0.0/22
+    - name: internal lb cidr
+      value: 10.32.4.0/22
+    zone: US-EAST-04A

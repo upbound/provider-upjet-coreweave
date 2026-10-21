@@ -1,0 +1,50 @@
+apiVersion: cks.coreweave.m.upbound.io/v1beta1
+kind: Cluster
+metadata:
+  annotations:
+    meta.upbound.io/example-id: cks/v1beta1/cluster
+  labels:
+    testing.upbound.io/example-name: cks-v1beta1-cluster
+  name: example-cluster
+  namespace: upbound-system
+spec:
+  forProvider:
+    name: example-cluster
+    zone: US-EAST-04A
+    version: v1.35
+    public: false
+    vpcIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: cks-v1beta1-cluster
+    podCidrName: pod cidr
+    serviceCidrName: service cidr
+    internalLbCidrNames:
+    - internal lb cidr
+
+---
+
+apiVersion: networking.coreweave.m.upbound.io/v1beta1
+kind: VPC
+metadata:
+  annotations:
+    meta.upbound.io/example-id: cks/v1beta1/cluster
+  labels:
+    testing.upbound.io/example-name: cks-v1beta1-cluster
+  name: example-cluster
+  namespace: upbound-system
+spec:
+  forProvider:
+    name: example-cluster
+    zone: US-EAST-04A
+    hostPrefixes:
+    - name: primary
+      type: PRIMARY
+      prefixes:
+      - 10.16.192.0/18
+    vpcPrefixes:
+    - name: pod cidr
+      value: 10.0.0.0/13
+    - name: service cidr
+      value: 10.16.0.0/22
+    - name: internal lb cidr
+      value: 10.32.4.0/22
