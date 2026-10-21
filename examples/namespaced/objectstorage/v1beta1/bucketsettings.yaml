@@ -1,0 +1,33 @@
+apiVersion: objectstorage.coreweave.m.upbound.io/v1beta1
+kind: BucketSettings
+metadata:
+  annotations:
+    meta.upbound.io/example-id: objectstorage/v1beta1/bucketsettings
+  labels:
+    testing.upbound.io/example-name: objectstorage-v1beta1-bucketsettings
+  name: example-bucketsettings
+  namespace: upbound-system
+spec:
+  forProvider:
+    bucketSelector:
+      matchLabels:
+        testing.upbound.io/example-name: objectstorage-v1beta1-bucketsettings
+    archiveEnabled: true
+    archiveAfterLastAccessDays: 60
+    auditLoggingEnabled: true
+    capacityCapBytes: 1099511627776
+
+---
+
+apiVersion: objectstorage.coreweave.m.upbound.io/v1beta1
+kind: Bucket
+metadata:
+  annotations:
+    meta.upbound.io/example-id: objectstorage/v1beta1/bucketsettings
+  labels:
+    testing.upbound.io/example-name: objectstorage-v1beta1-bucketsettings
+  name: example-bucketsettings
+  namespace: upbound-system
+spec:
+  forProvider:
+    zone: US-EAST-04A

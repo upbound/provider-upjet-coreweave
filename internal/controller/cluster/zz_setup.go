@@ -11,6 +11,14 @@ import (
 
 	cluster "github.com/upbound/provider-coreweave/internal/controller/cluster/cks/cluster"
 	vpc "github.com/upbound/provider-coreweave/internal/controller/cluster/networking/vpc"
+	accesskey "github.com/upbound/provider-coreweave/internal/controller/cluster/objectstorage/accesskey"
+	bucket "github.com/upbound/provider-coreweave/internal/controller/cluster/objectstorage/bucket"
+	bucketinventory "github.com/upbound/provider-coreweave/internal/controller/cluster/objectstorage/bucketinventory"
+	bucketlifecycleconfiguration "github.com/upbound/provider-coreweave/internal/controller/cluster/objectstorage/bucketlifecycleconfiguration"
+	bucketpolicy "github.com/upbound/provider-coreweave/internal/controller/cluster/objectstorage/bucketpolicy"
+	bucketsettings "github.com/upbound/provider-coreweave/internal/controller/cluster/objectstorage/bucketsettings"
+	bucketversioning "github.com/upbound/provider-coreweave/internal/controller/cluster/objectstorage/bucketversioning"
+	organizationaccesspolicy "github.com/upbound/provider-coreweave/internal/controller/cluster/objectstorage/organizationaccesspolicy"
 	providerconfig "github.com/upbound/provider-coreweave/internal/controller/cluster/providerconfig"
 )
 
@@ -20,6 +28,14 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 	for _, setup := range []func(ctrl.Manager, controller.Options) error{
 		cluster.Setup,
 		vpc.Setup,
+		accesskey.Setup,
+		bucket.Setup,
+		bucketinventory.Setup,
+		bucketlifecycleconfiguration.Setup,
+		bucketpolicy.Setup,
+		bucketsettings.Setup,
+		bucketversioning.Setup,
+		organizationaccesspolicy.Setup,
 		providerconfig.Setup,
 	} {
 		if err := setup(mgr, o); err != nil {
@@ -35,6 +51,14 @@ func SetupGated(mgr ctrl.Manager, o controller.Options) error {
 	for _, setup := range []func(ctrl.Manager, controller.Options) error{
 		cluster.SetupGated,
 		vpc.SetupGated,
+		accesskey.SetupGated,
+		bucket.SetupGated,
+		bucketinventory.SetupGated,
+		bucketlifecycleconfiguration.SetupGated,
+		bucketpolicy.SetupGated,
+		bucketsettings.SetupGated,
+		bucketversioning.SetupGated,
+		organizationaccesspolicy.SetupGated,
 		providerconfig.SetupGated,
 	} {
 		if err := setup(mgr, o); err != nil {
@@ -49,6 +73,14 @@ func SetupWebhookWithManager(mgr ctrl.Manager) error {
 	for _, setup := range []func(ctrl.Manager) error{
 		cluster.SetupWebhookWithManager,
 		vpc.SetupWebhookWithManager,
+		accesskey.SetupWebhookWithManager,
+		bucket.SetupWebhookWithManager,
+		bucketinventory.SetupWebhookWithManager,
+		bucketlifecycleconfiguration.SetupWebhookWithManager,
+		bucketpolicy.SetupWebhookWithManager,
+		bucketsettings.SetupWebhookWithManager,
+		bucketversioning.SetupWebhookWithManager,
+		organizationaccesspolicy.SetupWebhookWithManager,
 		providerconfig.SetupWebhookWithManager,
 	} {
 		if err := setup(mgr); err != nil {
