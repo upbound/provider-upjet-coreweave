@@ -6,6 +6,7 @@ package namespaced
 
 import (
 	"github.com/upbound/provider-coreweave/config/namespaced/cks"
+	"github.com/upbound/provider-coreweave/config/namespaced/inference"
 	"github.com/upbound/provider-coreweave/config/namespaced/objectstorage"
 )
 
@@ -13,4 +14,5 @@ import (
 func init() {
 	ProviderConfiguration.AddConfig(cks.Configure)
 	ProviderConfiguration.AddConfig(objectstorage.Configure)
+	ProviderConfiguration.AddConfig(inference.Configure)
 }

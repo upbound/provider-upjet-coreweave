@@ -1,0 +1,18 @@
+apiVersion: inference.coreweave.m.upbound.io/v1beta1
+kind: CapacityClaim
+metadata:
+  annotations:
+    meta.upbound.io/example-id: inference/v1beta1/capacityclaim
+  labels:
+    testing.upbound.io/example-name: inference-v1beta1-capacityclaim
+  name: example-capacityclaim
+  namespace: upbound-system
+spec:
+  forProvider:
+    name: example-capacityclaim
+    resources:
+      capacityType: CAPACITY_TYPE_MANAGED
+      instanceType: h100-80gb-sxm5
+      instanceCount: 2
+      zones:
+      - US-EAST-04A

@@ -1,0 +1,19 @@
+apiVersion: inference.coreweave.m.upbound.io/v1beta1
+kind: Gateway
+metadata:
+  annotations:
+    meta.upbound.io/example-id: inference/v1beta1/gateway
+  labels:
+    testing.upbound.io/example-name: inference-v1beta1-gateway
+  name: example-gateway
+  namespace: upbound-system
+spec:
+  forProvider:
+    name: example-gateway
+    zones:
+    - US-EAST-04A
+    auth:
+      coreweave: {}
+    routing:
+      bodyBased:
+        apiType: API_TYPE_OPENAI

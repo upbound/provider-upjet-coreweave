@@ -56,4 +56,7 @@ var GroupMap = map[string]GroupKindCalculator{
 	"coreweave_object_storage_bucket_versioning":              ReplaceGroupWords("objectstorage", 2),
 	"coreweave_object_storage_access_key":                     ReplaceGroupWords("objectstorage", 2),
 	"coreweave_object_storage_organization_access_policy":     ReplaceGroupWords("objectstorage", 2),
+	"coreweave_inference_capacity_claim":                      ReplaceGroupWords("inference", 1),
+	"coreweave_inference_deployment":                          ReplaceGroupWords("inference", 1),
+	"coreweave_inference_gateway":                             ReplaceGroupWords("inference", 1),
 }

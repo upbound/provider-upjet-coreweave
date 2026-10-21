@@ -1,0 +1,57 @@
+apiVersion: inference.coreweave.upbound.io/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    meta.upbound.io/example-id: inference/v1beta1/deployment
+  labels:
+    testing.upbound.io/example-name: inference-v1beta1-deployment
+  name: example-deployment
+spec:
+  forProvider:
+    name: example-deployment
+    gatewayIdsSelector:
+      matchLabels:
+        testing.upbound.io/example-name: inference-v1beta1-deployment
+    model:
+      bucket: example-deployment-models
+      name: meta-llama/Llama-3.1-8B
+      path: models/llama-3.1-8b
+    resources:
+      gpuCount: 1
+      instanceType: H100_80GB_SXM5
+    runtime:
+      engine: vllm
+      version: 0.8.5
+      engineConfig:
+        max-model-len: "8192"
+    autoscaling:
+      min: 1
+      max: 4
+      concurrency: 16
+      priority: 100
+      capacityClasses:
+      - CAPACITY_CLASS_RESERVED
+      - CAPACITY_CLASS_ON_DEMAND
+    traffic:
+      weight: 100
+
+---
+
+apiVersion: inference.coreweave.upbound.io/v1beta1
+kind: Gateway
+metadata:
+  annotations:
+    meta.upbound.io/example-id: inference/v1beta1/deployment
+  labels:
+    testing.upbound.io/example-name: inference-v1beta1-deployment
+  name: example-deployment
+spec:
+  forProvider:
+    name: example-deployment
+    zones:
+    - US-EAST-04A
+    auth:
+      coreweave: {}
+    routing:
+      bodyBased:
+        apiType: API_TYPE_OPENAI
