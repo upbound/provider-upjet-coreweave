@@ -1,0 +1,48 @@
+apiVersion: networking.coreweave.m.upbound.io/v1beta1
+kind: VPC
+metadata:
+  annotations:
+    meta.upbound.io/example-id: networking/v1beta1/vpc
+  labels:
+    testing.upbound.io/example-name: example
+  name: example
+  namespace: upbound-system
+spec:
+  forProvider:
+    dhcp:
+      dns:
+        servers:
+        - 1.1.1.1
+        - 8.8.8.8
+    egress:
+      disablePublicAccess: false
+    hostPrefixes:
+    - name: primary
+      prefixes:
+      - 10.16.192.0/18
+      - 2601:db8:aaaa::/48
+      type: PRIMARY
+    - ipam:
+        gatewayAddressPolicy: FIRST_IP
+        prefixLength: 80
+      name: container-network
+      prefixes:
+      - 2601:db8:bbbb::/48
+      type: ROUTED
+    - ipam:
+        prefixLength: 64
+      name: attached-network
+      prefixes:
+      - 2601:db8:cccc::/48
+      type: ATTACHED
+    ingress:
+      disablePublicServices: false
+    name: default
+    vpcPrefixes:
+    - name: pod cidr
+      value: 10.0.0.0/13
+    - name: service cidr
+      value: 10.16.0.0/22
+    - name: internal lb cidr
+      value: 10.32.4.0/22
+    zone: US-EAST-04A

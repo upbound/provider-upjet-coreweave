@@ -1,0 +1,1180 @@
+name: coreweave/coreweave
+resources:
+    coreweave_cks_cluster:
+        subCategory: ""
+        description: Create and manage clusters on CoreWeave Kubernetes Service (CKS) https://docs.coreweave.com/products/cks/clusters/introduction.
+        name: coreweave_cks_cluster
+        title: coreweave_cks_cluster Resource - coreweave
+        examples:
+            - name: default
+              manifest: |-
+                {
+                  "audit_policy": "${filebase64(\"${path.module}/audit-policy.yaml\")}",
+                  "authn_webhook": {
+                    "ca": "${filebase64(\"${path.module}/example-ca.crt\")}",
+                    "server": "https://samples.auth0.com/"
+                  },
+                  "authz_webhook": {
+                    "ca": "${filebase64(\"${path.module}/example-ca.crt\")}",
+                    "server": "https://samples.auth0.com/"
+                  },
+                  "internal_lb_cidr_names": [
+                    "internal lb cidr"
+                  ],
+                  "kubelet": "${jsonencode({ maxPods = 256 })}",
+                  "name": "default",
+                  "oidc": {
+                    "ca": "${filebase64(\"${path.module}/example-ca.crt\")}",
+                    "client_id": "kbyuFDidLLm280LIwVFiazOqjO3ty8KH",
+                    "groups_claim": "read-only",
+                    "groups_prefix": "cw",
+                    "issuer_url": "https://samples.auth0.com/",
+                    "required_claim": "",
+                    "signing_algs": [
+                      "SIGNING_ALGORITHM_RS256"
+                    ],
+                    "username_claim": "user_id",
+                    "username_prefix": "cw"
+                  },
+                  "pod_cidr_name": "pod cidr",
+                  "public": false,
+                  "service_cidr_name": "service cidr",
+                  "version": "v1.35",
+                  "vpc_id": "${coreweave_networking_vpc.default.id}",
+                  "zone": "US-EAST-04A"
+                }
+              references:
+                vpc_id: coreweave_networking_vpc.default.id
+              dependencies:
+                coreweave_networking_vpc.default: |-
+                    {
+                      "host_prefixes": [
+                        {
+                          "name": "primary",
+                          "prefixes": [
+                            "10.16.192.0/18"
+                          ],
+                          "type": "PRIMARY"
+                        }
+                      ],
+                      "name": "default",
+                      "vpc_prefixes": [
+                        {
+                          "name": "pod cidr",
+                          "value": "10.0.0.0/13"
+                        },
+                        {
+                          "name": "service cidr",
+                          "value": "10.16.0.0/22"
+                        },
+                        {
+                          "name": "internal lb cidr",
+                          "value": "10.32.4.0/22"
+                        }
+                      ],
+                      "zone": "US-EAST-04A"
+                    }
+        argumentDocs:
+            additional_server_sans: (Set of String) Additional Subject Alternative Names (SANs) to include in the Kubernetes API server TLS certificate. Maximum 10 entries.
+            admin_group_binding: (String) The OIDC group that is bound to the cluster-admin role for bootstrap access to the cluster.
+            allow_cidrs: (Set of String) Source network prefixes allowed to reach the endpoint. An empty set allows all sources, subject to deny_cidrs. A non-empty set denies every other source, so 0.0.0.0/0 alone allows only IPv4 sources and ::/0 alone allows only IPv6 sources. At most 1024 entries. Each must be an IPv4 or IPv6 network address with no host bits set, such as 203.0.113.0/24.
+            api_server_endpoint: (String) The endpoint for the cluster's api-server.
+            audit_policy: (String) Audit policy for the cluster. Must be provided as a base64-encoded JSON/YAML string.
+            authn_webhook: (Attributes) Authentication webhook configuration for the cluster. (see below for nested schema)
+            authz_webhook: (Attributes) Authorization webhook configuration for the cluster. (see below for nested schema)
+            ca: (String) The CA certificate for the webhook server. Must be a base64-encoded PEM-encoded certificate.
+            ca_data: (String) The base64-encoded PEM CA bundle for the Kubernetes API server. Use base64decode() to obtain the PEM text. null until the API reports a CA.
+            client_id: (String) The client ID for the OIDC client.
+            deny_cidrs: (Set of String) Source network prefixes denied access to the endpoint. Entries take precedence over allow_cidrs. At most 1024 entries. Each must be an IPv4 or IPv6 network address with no host bits set, such as 203.0.113.0/24.
+            end: (Number)
+            endpoint: (String) The HTTPS URL of the public Kubernetes API endpoint, suitable for a kubeconfig server. null until the endpoint is available.
+            groups_claim: (String) The claim to use as the groups.
+            groups_prefix: (String) The prefix to use for the groups.
+            id: (String) The unique identifier of the cluster.
+            internal_lb_cidr_names: |-
+                (List of String) The names of the vpc prefixes to use as internal load balancer CIDR ranges. Internal load balancers are reachable within the VPC but not accessible from the internet.
+                The prefixes must exist in the cluster's VPC. This field is append-only.
+            internal_lb_cidr_names_v6: (List of String) IPv6 Internal Load Balancer CIDR names. If any IPv6 field is set, then ALL IPv6 fields must be set.
+            issuer_url: (String) The URL of the OIDC issuer.
+            kube_api_access: (Attributes) Access configuration for the cluster's Kubernetes API server, independent of public. Before you set this attribute, contact CoreWeave support to enable this feature for your organization. When this attribute is omitted, the next apply clears any access configured outside Terraform. Changes, including clears, cannot be applied in the same update as a Kubernetes version change. (see below for nested schema)
+            kube_api_access_status: (Attributes) Observed state of Kubernetes API access, known after apply and updated on refresh. Values may lag a configuration change until the API observes it. They are unknown during any in-place update plan, so providers configured from them receive unknown values during that plan. (see below for nested schema)
+            kubelet: (String) Selective overrides applied to every cluster Node's kubelet configuration, as a JSON object (e.g. jsonencode({ maxPods = 256 })). A Node reboot is required for changes to take effect, and unknown options are stored but ignored by CKS. See the Kubernetes kubelet configuration reference for supported options.
+            name: (String) The name of the cluster. Must not be longer than 30 characters.
+            node_port_range: (Attributes) Kubernetes Service NodePort range. NodePort range can be expanded in existing clusters but not shrunk. Updating the NodePort range to a smaller range will require a replacement of the cluster. (see below for nested schema)
+            oidc: (Attributes) OpenID Connect (OIDC) configuration for authentication to the api-server. (see below for nested schema)
+            pod_cidr_name: (String) The name of the vpc prefix to use as the pod CIDR range. The prefix must exist in the cluster's VPC.
+            pod_cidr_name_v6: (String) IPv6 Pod CIDR name. If any IPv6 field is set, then ALL IPv6 fields must be set.
+            public: (Boolean) Whether the cluster's Kubernetes API server is reachable through CoreWeave's public ingress, which supports CoreWeave-managed authentication. This setting is independent of kube_api_access.
+            required_claim: (String) The claim to require for authentication.
+            server: (String) The URL of the webhook server.
+            service_account_oidc_issuer_url: (String) The URL of the OIDC issuer for the cluster's service account tokens. This value corresponds to the --service-account-issuer flag on the kube-apiserver.
+            service_cidr_name: (String) The name of the vpc prefix to use as the service CIDR range. The prefix must exist in the cluster's VPC.
+            service_cidr_name_v6: (String) IPv6 Service CIDR name. If any IPv6 field is set, then ALL IPv6 fields must be set.
+            shared_storage_cluster_id: (String) The cluster_id of the cluster to share storage with. Must be enabled by CoreWeave support. Contact CoreWeave support if you are interested in this feature.
+            signing_algs: (Set of String) A list of signing algorithms that the OpenID Connect discovery endpoint uses.
+            start: (Number)
+            status: (String) The current status of the cluster.
+            tailscale: (Attributes) Tailscale configuration for the cluster. Enables cluster access via a Tailscale VPN. (see below for nested schema)
+            username_claim: (String) The claim to use as the username.
+            username_prefix: (String) The prefix to use for the username.
+            version: (String) The version of Kubernetes to run on the cluster, in minor version format (e.g. 'v1.35'). Patch versions are automatically applied by CKS as they are released.
+            vpc_id: (String) The ID of the VPC in which the cluster is located. Must be a VPC in the same Availability Zone as the cluster.
+            zone: (String) The Availability Zone in which the cluster is located.
+        importStatements:
+            - terraform import coreweave_cks_cluster.default {{id}}
+    coreweave_container_registry_access_configuration:
+        subCategory: ""
+        description: Authoritatively manages the complete Container Registry access configuration. Omitted entries are removed. Use one owner per namespace; avoid concurrent changes from the console, CLI or another Terraform resource. Destroy resets access to deny-all and removes the IP ACL. It does not restore an earlier policy. Use terraform state rm or a removed block with destroy = false to relinquish ownership without resetting the policy. If the parent is not ACTIVE, destroy warns and relinquishes ownership because the API cannot reset the policy. A retained namespace keeps its policy if it later becomes ACTIVE. Parent references establish deletion ordering. Apply waits until the API reports the desired access revision as accepted. Action deadlines default to 20 minutes.
+        name: coreweave_container_registry_access_configuration
+        title: coreweave_container_registry_access_configuration Resource - coreweave
+        examples:
+            - name: images
+              manifest: |-
+                {
+                  "namespace": "${coreweave_container_registry_namespace.images.name}",
+                  "policy_sets": {
+                    "readers": {
+                      "identity_selector": "COREWEAVE",
+                      "rules": {
+                        "pull": {
+                          "expression": "identity[\"org_id\"] == ${jsonencode(var.org_id)} \u0026\u0026 \"read_registry_content\" in identity[\"roles\"] \u0026\u0026 request[\"type\"] == \"repository\" \u0026\u0026 request[\"action\"] == \"pull\""
+                        }
+                      }
+                    }
+                  },
+                  "request_ip_acl": {
+                    "allow_cidrs": [
+                      "192.0.2.0/24",
+                      "2001:db8::/32"
+                    ],
+                    "deny_cidrs": [
+                      "192.0.2.128/25"
+                    ]
+                  }
+                }
+              references:
+                namespace: coreweave_container_registry_namespace.images.name
+              dependencies:
+                coreweave_container_registry_namespace.images: |-
+                    {
+                      "initial_access_configuration": {},
+                      "name": "example-images",
+                      "zone": "US-LAB-01A"
+                    }
+        argumentDocs:
+            access_config_state: (String) Current access policy rollout state.
+            allow_cidrs: (Set of String) Canonical IPv4 or IPv6 networks; host bits and IPv4-mapped IPv6 are rejected.
+            create: (String) A string that can be parsed as a duration consisting of numbers and unit suffixes, such as "30s" or "2h45m". Valid time units are "s" (seconds), "m" (minutes), "h" (hours).
+            created_at: (String) Creation timestamp in RFC3339 format.
+            delete: (String) A string that can be parsed as a duration consisting of numbers and unit suffixes, such as "30s" or "2h45m". Valid time units are "s" (seconds), "m" (minutes), "h" (hours). Setting a timeout for a Delete operation is only applicable if changes are saved into state before the destroy operation occurs.
+            deny_cidrs: (Set of String) Canonical IPv4 or IPv6 networks; host bits and IPv4-mapped IPv6 are rejected.
+            etag: (String) Current concurrency token. Changes when the server updates the resource.
+            expression: (String) CEL expression evaluated against the request identity and context.
+            id: (String) Canonical API resource name used as the Terraform identifier.
+            identity_selector: '(String) Identity class evaluated by this policy set. Supported values: COREWEAVE, WORKLOAD_FEDERATION, ANY_AUTHENTICATED, ANONYMOUS, COREWEAVE_KUBERNETES. COREWEAVE_KUBERNETES is deprecated; use WORKLOAD_FEDERATION.'
+            name: (String) Canonical API resource name.
+            namespace: (String) Parent namespace name, such as example-images. Changing it replaces this policy resource.
+            policy_sets: (Attributes Map) Authoritative policy sets keyed by stable IDs. Omitted entries are removed. COREWEAVE_KUBERNETES is deprecated; use WORKLOAD_FEDERATION. (see below for nested schema)
+            read: (String) A string that can be parsed as a duration consisting of numbers and unit suffixes, such as "30s" or "2h45m". Valid time units are "s" (seconds), "m" (minutes), "h" (hours). Read operations occur during any refresh or planning operation when refresh is enabled.
+            request_ip_acl: (Attributes) Optional request filter. At least one allow or deny network is required; omission removes the ACL. An ACL grants no authorization. (see below for nested schema)
+            revision: (Number) Current desired policy revision.
+            rules: (Attributes Map) Authoritative rules keyed by stable IDs. Omitted rules are removed. (see below for nested schema)
+            timeouts: (Attributes) (see below for nested schema)
+            update: (String) A string that can be parsed as a duration consisting of numbers and unit suffixes, such as "30s" or "2h45m". Valid time units are "s" (seconds), "m" (minutes), "h" (hours).
+            updated_at: (String) Last update timestamp in RFC3339 format.
+        importStatements:
+            - terraform import coreweave_container_registry_access_configuration.images example-images
+    coreweave_container_registry_lifecycle_policy:
+        subCategory: ""
+        description: Authoritatively manages the complete Container Registry lifecycle policy. Omitted entries are removed. Use one owner per namespace; avoid concurrent changes from the console, CLI or another Terraform resource. Destroy disables retention and removes all lifecycle rules. It does not restore an earlier policy. Use terraform state rm or a removed block with destroy = false to relinquish ownership without resetting the policy. If the parent is not ACTIVE, destroy warns and relinquishes ownership because the API cannot reset the policy. A retained namespace keeps its policy if it later becomes ACTIVE. Parent references establish deletion ordering. Action deadlines default to 20 minutes.
+        name: coreweave_container_registry_lifecycle_policy
+        title: coreweave_container_registry_lifecycle_policy Resource - coreweave
+        examples:
+            - name: images
+              manifest: |-
+                {
+                  "enabled": true,
+                  "namespace": "${coreweave_container_registry_namespace.images.name}",
+                  "rules": {
+                    "expire-ci": {
+                      "keep_newest": 10,
+                      "older_than": "2592000s",
+                      "regex": "ci/.*"
+                    }
+                  }
+                }
+              references:
+                namespace: coreweave_container_registry_namespace.images.name
+              dependencies:
+                coreweave_container_registry_namespace.images: |-
+                    {
+                      "force_destroy": false,
+                      "name": "example-images",
+                      "zone": "US-LAB-01A"
+                    }
+        argumentDocs:
+            applied_revision: (Number) Last lifecycle policy revision acknowledged by the worker. Acknowledgement does not indicate completed retention or garbage collection.
+            create: (String) A string that can be parsed as a duration consisting of numbers and unit suffixes, such as "30s" or "2h45m". Valid time units are "s" (seconds), "m" (minutes), "h" (hours).
+            created_at: (String) Creation timestamp in RFC3339 format.
+            delete: (String) A string that can be parsed as a duration consisting of numbers and unit suffixes, such as "30s" or "2h45m". Valid time units are "s" (seconds), "m" (minutes), "h" (hours). Setting a timeout for a Delete operation is only applicable if changes are saved into state before the destroy operation occurs.
+            enabled: (Boolean) Whether lifecycle retention is enabled. Defaults to false.
+            etag: (String) Current concurrency token. Changes when the server updates the resource.
+            id: (String) Canonical API resource name used as the Terraform identifier.
+            keep_newest: (Number) Number of newest matching images to retain, from 1 to 100.
+            name: (String) Canonical API resource name.
+            namespace: (String) Parent namespace name, such as example-images. Changing it replaces this policy resource.
+            older_than: (String) Canonical positive protobuf duration, such as 86400s.
+            read: (String) A string that can be parsed as a duration consisting of numbers and unit suffixes, such as "30s" or "2h45m". Valid time units are "s" (seconds), "m" (minutes), "h" (hours). Read operations occur during any refresh or planning operation when refresh is enabled.
+            regex: (String) Go RE2 expression matched against the complete repository name or repository:tag. Matching is anchored to the whole input.
+            revision: (Number) Current desired policy revision.
+            rules: (Attributes Map) Authoritative rules keyed by stable IDs. Omitted rules are removed. (see below for nested schema)
+            timeouts: (Attributes) (see below for nested schema)
+            update: (String) A string that can be parsed as a duration consisting of numbers and unit suffixes, such as "30s" or "2h45m". Valid time units are "s" (seconds), "m" (minutes), "h" (hours).
+            updated_at: (String) Last update timestamp in RFC3339 format.
+        importStatements:
+            - terraform import coreweave_container_registry_lifecycle_policy.images example-images
+    coreweave_container_registry_namespace:
+        subCategory: ""
+        description: Manages a Container Registry namespace and its storage quota. Initial access configuration is historical create-only input. The resource never automatically adopts an existing namespace. Destroy refuses to delete stored content unless force_destroy was applied beforehand. Action deadlines default to 20 minutes and are independent of HTTP attempt timeouts. An interrupted create can leave a tainted resource. Inspect the remote namespace and explicitly import it when private recovery state is unavailable.
+        name: coreweave_container_registry_namespace
+        title: coreweave_container_registry_namespace Resource - coreweave
+        examples:
+            - name: images
+              manifest: |-
+                {
+                  "force_destroy": false,
+                  "name": "example-images",
+                  "storage_quota_bytes": 107374182400,
+                  "timeouts": {
+                    "create": "30m",
+                    "delete": "30m"
+                  },
+                  "zone": "US-LAB-01A"
+                }
+        argumentDocs:
+            access_mode: (Attributes) Current effective namespace access mode. (see below for nested schema)
+            allow_cidrs: (Set of String) Canonical IPv4 or IPv6 networks; host bits and IPv4-mapped IPv6 are rejected.
+            blob_count: (Number) Number of stored blobs.
+            content_status: (Attributes) Server-reported storage usage and content counts. These observations may lag content changes. (see below for nested schema)
+            create: (String) A string that can be parsed as a duration consisting of numbers and unit suffixes, such as "30s" or "2h45m". Valid time units are "s" (seconds), "m" (minutes), "h" (hours).
+            created_at: (String) Creation timestamp in RFC3339 format.
+            created_by: (Attributes) Identity that created the namespace. (see below for nested schema)
+            delete: (String) A string that can be parsed as a duration consisting of numbers and unit suffixes, such as "30s" or "2h45m". Valid time units are "s" (seconds), "m" (minutes), "h" (hours). Setting a timeout for a Delete operation is only applicable if changes are saved into state before the destroy operation occurs.
+            deny_cidrs: (Set of String) Canonical IPv4 or IPv6 networks; host bits and IPv4-mapped IPv6 are rejected.
+            dns_name: (String) Registry hostname used for OCI pushes and pulls.
+            etag: (String) Current concurrency token. Changes when the server updates the resource.
+            expression: (String) CEL expression evaluated against the request identity and context.
+            force_destroy: (Boolean) Irreversibly delete content on destroy. Apply this setting before destroying; never enabled automatically.
+            id: (String) Canonical API resource name used as the Terraform identifier.
+            identity_selector: '(String) Identity class evaluated by this policy set. Supported values: COREWEAVE, WORKLOAD_FEDERATION, ANY_AUTHENTICATED, ANONYMOUS, COREWEAVE_KUBERNETES. COREWEAVE_KUBERNETES is deprecated; use WORKLOAD_FEDERATION.'
+            initial_access_configuration: (Attributes) Historical create-only input. Omission selects the server default; {} atomically installs deny-all. Any change replaces the namespace. Import leaves this null; adding it after import replaces the namespace. (see below for nested schema)
+            manifest_count: (Number) Number of stored manifests.
+            mode: (String) Effective access mode reported by the server.
+            name: (String) Namespace name used in the registry hostname, such as example-images. Changing it replaces the namespace.
+            org_id: (String) Organization that owns the namespace.
+            policy_sets: (Attributes Map) Authoritative policy sets keyed by stable IDs. Omitted entries are removed. COREWEAVE_KUBERNETES is deprecated; use WORKLOAD_FEDERATION. (see below for nested schema)
+            read: (String) A string that can be parsed as a duration consisting of numbers and unit suffixes, such as "30s" or "2h45m". Valid time units are "s" (seconds), "m" (minutes), "h" (hours). Read operations occur during any refresh or planning operation when refresh is enabled.
+            reasons: (Set of String) Server-reported reasons for the effective access mode.
+            repository_count: (Number) Number of repositories.
+            request_ip_acl: (Attributes) Optional request filter. At least one allow or deny network is required; omission removes the ACL. An ACL grants no authorization. (see below for nested schema)
+            rules: (Attributes Map) Authoritative rules keyed by stable IDs. Omitted rules are removed. (see below for nested schema)
+            status: (String) Current namespace provisioning state.
+            storage_quota_bytes: (Number) Namespace ceiling in bytes. Omission/null clears the ceiling; zero disables pushes after evaluation.
+            tag_count: (Number) Number of tags.
+            timeouts: (Attributes) (see below for nested schema)
+            update: (String) A string that can be parsed as a duration consisting of numbers and unit suffixes, such as "30s" or "2h45m". Valid time units are "s" (seconds), "m" (minutes), "h" (hours).
+            updated_at: (String) Last update timestamp in RFC3339 format.
+            updated_by: (Attributes) Identity that last updated the namespace. (see below for nested schema)
+            usage_bytes: (Number) Total stored content size in bytes.
+            user_uid: (String) CoreWeave user identifier.
+            username: (String) CoreWeave username.
+            zone: (String) Upper-case zone identifier. Changing it replaces the namespace.
+        importStatements:
+            - terraform import coreweave_container_registry_namespace.images example-images
+    coreweave_inference_capacity_claim:
+        subCategory: ""
+        description: Create and manage CoreWeave Managed Inference https://docs.coreweave.com/products/inference capacity claims for Dedicated Inference https://docs.coreweave.com/products/inference/dedicated. See capacity claims https://docs.coreweave.com/products/inference/scaling#capacity-claims for capacity type details.
+        name: coreweave_inference_capacity_claim
+        title: coreweave_inference_capacity_claim Resource - coreweave
+        examples:
+            - name: example
+              manifest: |-
+                {
+                  "name": "my-capacity-claim",
+                  "resources": {
+                    "capacity_type": "CAPACITY_TYPE_MANAGED",
+                    "instance_count": 2,
+                    "instance_type": "h100-80gb-sxm5",
+                    "zones": [
+                      "US-EAST-04A"
+                    ]
+                  }
+                }
+        argumentDocs:
+            allocated_instances: (Number) The number of instances currently allocated.
+            capacity_type: (String) The capacity type for the capacity claim. Must be CAPACITY_TYPE_MANAGED.
+            conditions: (Attributes List) Detailed status conditions for the capacity claim. (see below for nested schema)
+            created_at: (String) RFC3339 timestamp of when the capacity claim was created.
+            id: (String) The unique identifier of the capacity claim.
+            instance_count: (Number) The number of instances to reserve. Must be at least 1.
+            instance_type: (String) The instance type to reserve (e.g. gb200-4x). Case-sensitive.
+            last_update_time: (String) RFC3339 timestamp of the last condition transition.
+            message: (String) A human-readable message about the condition's last transition.
+            name: (String) The name of the capacity claim. Must be a valid hostname label.
+            organization_id: (String) The organization ID that owns the capacity claim.
+            pending_instances: (Number) The number of instances pending allocation.
+            reason: (String) A short, machine-readable reason for the condition's last transition.
+            resources: (Attributes) Resource configuration for the capacity claim. (see below for nested schema)
+            status: (String) The current status of the capacity claim. See the Inference API overview for status values.
+            type: (String) The condition type (e.g. Ready, Progressing).
+            updated_at: (String) RFC3339 timestamp of when the capacity claim was last updated.
+            zones: (Set of String) The availability zones where the capacity claim may use resources from (e.g. US-WEST-04A), case-sensitive. At least one is required.
+        importStatements:
+            - terraform import coreweave_inference_capacity_claim.example {{capacity-claim-id}}
+    coreweave_inference_deployment:
+        subCategory: ""
+        description: Create and manage CoreWeave Managed Inference https://docs.coreweave.com/products/inference deployments. See the getting started walkthrough https://docs.coreweave.com/products/inference/getting-started for the gateway-to-deployment flow.
+        name: coreweave_inference_deployment
+        title: coreweave_inference_deployment Resource - coreweave
+        examples:
+            - name: example
+              manifest: |-
+                {
+                  "autoscaling": {
+                    "capacity_classes": [
+                      "CAPACITY_CLASS_RESERVED",
+                      "CAPACITY_CLASS_ON_DEMAND"
+                    ],
+                    "concurrency": 16,
+                    "max": 4,
+                    "min": 1,
+                    "priority": 100
+                  },
+                  "gateway_ids": [
+                    "${tolist(data.coreweave_inference_deployment_parameters.deploy_params.gateway_ids)[0]}"
+                  ],
+                  "model": {
+                    "bucket": "my-model-bucket",
+                    "name": "meta-llama/Llama-3.1-8B",
+                    "path": "models/llama-3.1-8b"
+                  },
+                  "name": "my-llm",
+                  "resources": {
+                    "gpu_count": 1,
+                    "instance_type": "H100_80GB_SXM5"
+                  },
+                  "runtime": {
+                    "engine": "vllm",
+                    "engine_config": {
+                      "max-model-len": "8192"
+                    },
+                    "engine_env": {
+                      "VLLM_USE_FLASHINFER_MOE_FP4": "0"
+                    },
+                    "version": "0.8.5"
+                  },
+                  "traffic": {
+                    "weight": 100
+                  }
+                }
+        argumentDocs:
+            autoscaling: (Attributes) Autoscaling configuration. (see below for nested schema)
+            bucket: (String) The CAIOS bucket the model is stored in. The inference service account must have bucket access.
+            capacity_classes: '(List of String) Ordered preference list of capacity classes to use. Order is significant: the first satisfiable class wins. Allowed values: CAPACITY_CLASS_RESERVED, CAPACITY_CLASS_ON_DEMAND.'
+            concurrency: (Number) Concurrency per instance target (≥1). Controls latency vs throughput tradeoffs.
+            conditions: (Attributes List) Detailed status conditions for the deployment. (see below for nested schema)
+            created_at: (String) RFC3339 timestamp of when the deployment was created.
+            disabled: (Boolean) Whether the deployment is disabled.
+            engine: (String) The inference engine to use.
+            engine_config: (Map of String) Engine-specific configuration key/value pairs.
+            engine_env: (Map of String) Engine-specific environment variables to inject into the model runtime container. Variable names must come from the selected engine's server-side allow list, exposed by data.coreweave_inference_deployment_parameters.<name>.engine_env_options[<engine>].allowed_names; unsupported names are rejected by the API.
+            gateway_ids: (Set of String) The gateway IDs to associate the deployment with. At least one is required.
+            gpu_count: '(Number) Number of GPUs per instance. Must be one of: 1, 2, 4, 8, 16.'
+            id: (String) The unique identifier of the deployment.
+            instance_type: (String) The instance type to use.
+            last_update_time: (String) RFC3339 timestamp of the last condition transition.
+            max: (Number) Maximum number of instances. Must be ≥1.
+            message: (String) A human-readable message about the condition's last transition.
+            min: (Number) Minimum number of instances. Must be ≥1.
+            model: (Attributes) Model configuration. (see below for nested schema)
+            name: (String) The name of the deployment. Must be a valid hostname label.
+            organization_id: (String) The organization ID that owns the deployment.
+            path: (String) The CAIOS path to the model and its configuration files.
+            priority: (Number) Priority for cross-deployment scaling (0-1000). Higher values win when there is contention.
+            reason: (String) A short, machine-readable reason for the condition's last transition.
+            resources: (Attributes) GPU resource configuration for the deployment. (see below for nested schema)
+            runtime: (Attributes) Runtime selection and configuration. (see below for nested schema)
+            status: (String) The current status of the deployment. See the Inference API overview for status values. Creation and updates that disable the deployment return once resources are applied rather than once the deployment is serving, so the status may not be ready immediately. An update to a serving deployment instead blocks until the rollout reaches STATUS_READY. Poll the API for live readiness.
+            traffic: (Attributes) Traffic configuration. Omit to accept the API default (weight 0, which normalizes to 100% when no other deployment shares the model name). After apply, weight is populated from the API. (see below for nested schema)
+            type: (String) The condition type (e.g. Ready, Progressing).
+            updated_at: (String) RFC3339 timestamp of when the deployment was last updated.
+            version: (String) The version of the engine. If not set, defaults to the latest available version. Must follow semver format (e.g. 1.2.3).
+            weight: (Number) Traffic weight (0-1000). Values are normalized into percentages across deployments with the same model name.
+        importStatements:
+            - terraform import coreweave_inference_deployment.example {{deployment-id}}
+    coreweave_inference_gateway:
+        subCategory: ""
+        description: Create and manage CoreWeave Managed Inference https://docs.coreweave.com/products/inference gateways. See gateways https://docs.coreweave.com/products/inference/gateways for authentication and routing details.
+        name: coreweave_inference_gateway
+        title: coreweave_inference_gateway Resource - coreweave
+        examples:
+            - name: example
+              manifest: |-
+                {
+                  "auth": {
+                    "coreweave": {}
+                  },
+                  "name": "my-gateway",
+                  "routing": {
+                    "body_based": {
+                      "api_type": "API_TYPE_OPENAI"
+                    }
+                  },
+                  "zones": [
+                    "US-EAST-04A"
+                  ]
+                }
+        argumentDocs:
+            additional_dns: (Set of String) Additional DNS names for the gateway endpoint. These DNS names must be manually configured to point to the gateway endpoint.
+            allowed_source_ip_ranges: (Set of String) Client source IP ranges permitted to reach the gateway, in CIDR notation (IPv4 or IPv6). Up to 50 entries; an empty list applies no source restriction. Use a full-length prefix for a single address (e.g. 203.0.113.5/32).
+            api_key: (String, Sensitive) The organization API key for Weights & Biases. Requires server_url to also be set.
+            api_type: '(String) The well-known API type for routing. Must be one of: API_TYPE_OPENAI.'
+            auth: (Attributes) The authentication configuration for the gateway. Exactly one of coreweave or weights_and_biases must be specified. (see below for nested schema)
+            body_based: (Attributes) Body-based routing configuration. Routes requests based on the request body content. (see below for nested schema)
+            conditions: (Attributes List) Detailed status conditions for the gateway. (see below for nested schema)
+            coreweave: (Attributes) Use CoreWeave IAM authentication. (see below for nested schema)
+            created_at: (String) RFC3339 timestamp of when the gateway was created.
+            edge_proxy_mode: '(String) How client traffic reaches the gateway. Must be one of: EDGE_PROXY_MODE_MANAGED (traffic is proxied through CoreWeave''s managed edge network: DDoS mitigation and WAF, with TLS terminated at the edge and the origin address kept out of public DNS) or EDGE_PROXY_MODE_DIRECT (clients connect straight to the gateway''s load balancer, with no edge filtering and the load balancer address published in DNS). When unset, the platform default (currently EDGE_PROXY_MODE_MANAGED) applies.'
+            enable_rate_limiting: (Boolean) Whether to enable Weights & Biases controlled rate limiting.
+            enable_usage_reports: (Boolean) Whether to send usage data to Weights & Biases.
+            endpoint_configuration: (Attributes) Additional endpoint configuration options. (see below for nested schema)
+            endpoints: (Set of String) The endpoint URIs for the gateway.
+            header_based: (Attributes) Header-based routing configuration. Routes requests using a header value to match the model by name. (see below for nested schema)
+            header_name: (String) The name of the header to use for routing.
+            id: (String) The unique identifier of the gateway.
+            last_update_time: (String) RFC3339 timestamp of the last condition transition.
+            message: (String) A human-readable message about the condition's last transition.
+            name: (String) The human-readable name of the gateway. Capped at 38 characters so the derived public FQDN fits within the 64-character X.509 Common Name limit.
+            organization_id: (String) The organization ID that owns the gateway.
+            path_based: (Attributes) Path-based routing configuration. Routes requests based on the URL path. (see below for nested schema)
+            reason: (String) A short, machine-readable reason for the condition's last transition.
+            routing: (Attributes) The routing configuration for the gateway. Exactly one of body_based, header_based, or path_based must be specified. (see below for nested schema)
+            server_url: (String) The Weights & Biases server URL. Defaults to the shared SaaS instance if not set.
+            status: (String) The current status of the gateway. See the Inference API overview for status values.
+            type: (String) The condition type (e.g. Ready, Progressing).
+            updated_at: (String) RFC3339 timestamp of when the gateway was last updated.
+            weights_and_biases: (Attributes) Use Weights & Biases authentication. (see below for nested schema)
+            zones: (Set of String) The zones to make the gateway available in. Limits where deployments associated with the gateway may exist.
+        importStatements:
+            - terraform import coreweave_inference_gateway.example {{gateway-id}}
+    coreweave_networking_vpc:
+        subCategory: ""
+        description: Create and manage VPCs. Learn more about CoreWeave VPCs https://docs.coreweave.com/products/networking/vpc/about-vpcs.
+        name: coreweave_networking_vpc
+        title: coreweave_networking_vpc Resource - coreweave
+        examples:
+            - name: example
+              manifest: |-
+                {
+                  "dhcp": {
+                    "dns": {
+                      "servers": [
+                        "1.1.1.1",
+                        "8.8.8.8"
+                      ]
+                    }
+                  },
+                  "egress": {
+                    "disable_public_access": false
+                  },
+                  "host_prefixes": [
+                    {
+                      "name": "primary",
+                      "prefixes": [
+                        "10.16.192.0/18",
+                        "2601:db8:aaaa::/48"
+                      ],
+                      "type": "PRIMARY"
+                    },
+                    {
+                      "ipam": {
+                        "gateway_address_policy": "FIRST_IP",
+                        "prefix_length": 80
+                      },
+                      "name": "container-network",
+                      "prefixes": [
+                        "2601:db8:bbbb::/48"
+                      ],
+                      "type": "ROUTED"
+                    },
+                    {
+                      "ipam": {
+                        "prefix_length": 64
+                      },
+                      "name": "attached-network",
+                      "prefixes": [
+                        "2601:db8:cccc::/48"
+                      ],
+                      "type": "ATTACHED"
+                    }
+                  ],
+                  "ingress": {
+                    "disable_public_services": false
+                  },
+                  "name": "default",
+                  "vpc_prefixes": [
+                    {
+                      "name": "pod cidr",
+                      "value": "10.0.0.0/13"
+                    },
+                    {
+                      "name": "service cidr",
+                      "value": "10.16.0.0/22"
+                    },
+                    {
+                      "name": "internal lb cidr",
+                      "value": "10.32.4.0/22"
+                    }
+                  ],
+                  "zone": "US-EAST-04A"
+                }
+        argumentDocs:
+            dhcp: (Attributes) Settings affecting DHCP behavior within the VPC. (see below for nested schema)
+            disable_public_access: (Boolean) Specifies whether the VPC should be blocked from consuming public Internet.
+            disable_public_services: (Boolean) Specifies whether the VPC should prevent public prefixes advertised from Nodes from being imported into public-facing networks, making them inaccessible from the Internet.
+            dns: (Attributes) Settings affecting DNS for DHCP within the VPC (see below for nested schema)
+            egress: (Attributes) Settings affecting traffic leaving the VPC. (see below for nested schema)
+            gateway_address_policy: '(String) Describes which IP address from the prefix is allocated to the network gateway. Must be one of: UNSPECIFIED, EUI64, FIRST_IP, LAST_IP.'
+            host_prefix: (String, Deprecated) An IPv4 CIDR range used to allocate host addresses when booting compute into a VPC. For SUNK clusters, use a prefix no smaller than your Zone's default host prefix (a mask no longer than the default) so that host addresses reflect each node's physical location. SUNK uses this location information to place network-adjacent nodes together, which improves distributed-training performance. A prefix smaller than the Zone default (a longer mask) doesn't carry this location information, so it produces less optimal placement. If you need a different size, CoreWeave can approve one for your account on request. For non-SUNK VPCs, any prefix size is accepted. However, NVL72 rack-level instances require a host prefix no smaller than the Zone's default host prefix. A smaller prefix forces dynamic address allocation, which breaks standard IMEX address mapping across the cluster. IMEX with Dynamic Resource Allocation (DRA) doesn't have this limitation. If left unspecified, a Zone-specific default value will be applied by the server. See Host prefixes for details. This field is immutable once set.
+            host_prefixes: (Attributes Set) The IPv4 or IPv6 CIDR ranges used to allocate host addresses when booting compute into a VPC. For SUNK clusters, use an IPv4 prefix no smaller than your Zone's default host prefix (a mask no longer than the default) so that host addresses reflect each node's physical location. SUNK uses this location information to place network-adjacent nodes together, which improves distributed-training performance. A prefix smaller than the Zone default (a longer mask) doesn't carry this location information, so it produces less optimal placement. If you need a different size, CoreWeave can approve one for your account on request. For non-SUNK VPCs, any prefix size is accepted. However, NVL72 rack-level instances require a primary host prefix (type = PRIMARY) no smaller than the Zone's default host prefix. A smaller prefix forces dynamic address allocation, which breaks standard IMEX address mapping across the cluster. IMEX with Dynamic Resource Allocation (DRA) doesn't have this limitation. See Host prefixes for details. (see below for nested schema)
+            id: (String) The unique identifier for the VPC.
+            ingress: (Attributes) Settings affecting traffic entering the VPC. (see below for nested schema)
+            ipam: (Attributes) The configuration for a secondary host prefix. (see below for nested schema)
+            name: (String) The name of the VPC. Must not be longer than 30 characters.
+            prefix_length: (Number) The desired length for each Node's allocation from the VPC-wide aggregate prefix.
+            prefixes: (List of String) The VPC-wide aggregates from which host-specific prefixes are allocated. May be IPv4 or IPv6.
+            servers: (Set of String) The DNS servers to be used by DHCP clients within the VPC.
+            type: '(String) Controls network connectivity from the prefix to the host. Must be one of: PRIMARY, ROUTED, ATTACHED.'
+            value: (String)
+            vpc_prefixes: (Attributes Set) A list of additional prefixes associated with the VPC. For example, CKS clusters use these prefixes for Pod and service CIDR ranges. (see below for nested schema)
+            zone: (String) The Availability Zone in which the VPC is located.
+        importStatements:
+            - terraform import coreweave_networking_vpc.default {{id}}
+    coreweave_object_storage_access_key:
+        subCategory: ""
+        description: 'Manages one AI Object Storage access key for the authenticated caller. Existing organization policies determine its permissions. Destroy revokes only this key. Set duration_seconds explicitly when creating a key: zero creates a permanent key. Changes to duration or attributes replace the key. Use terraform apply -replace=coreweave_object_storage_access_key.example for manual rotation. There is no background renewal; distribute the new secret to consumers before removing an old key, using separate resources when an overlap is needed. Refresh removes missing keys and keys reported as DELETED from state, so the next apply recreates them when a duration is configured. Expired and inactive keys remain managed, with their API status and a warning; they are not automatically rotated or reactivated. If the service later removes an expired key, it is treated as missing. Import uses the key ID. The secret and original duration cannot be recovered and remain null. Omit duration_seconds in the imported resource configuration to keep the existing key; setting it explicitly plans replacement. Omit attributes to adopt the imported values, or configure the same values. Supply an explicit duration before intentionally replacing an imported key. Protect access to Terraform state and backups: marking the secret sensitive hides normal CLI output but does not encrypt or omit it from state. Key creation is sent once without automatic retries. If its response is lost, a key may exist whose ID and secret were not saved; inspect keys using the service tooling before trying again.'
+        name: coreweave_object_storage_access_key
+        title: coreweave_object_storage_access_key Resource - coreweave
+        examples:
+            - name: example
+              manifest: |-
+                {
+                  "attributes": {
+                    "application": "training"
+                  },
+                  "duration_seconds": 0
+                }
+        argumentDocs:
+            attributes: (Map of String) Creation attributes, at most 15 entries. Keys must be lowercase DNS labels of 1-63 characters and must not start with cw-, role, or groups. Values must be Kubernetes label values of at most 63 characters (empty allowed). Changes replace the key. Omitted values are adopted during import.
+            duration_seconds: (Number) Required for creation; integer from 0 to 4294967295. Zero means permanent. Omit only when retaining an imported key whose original duration is unavailable. Changing this value replaces the key.
+            expiry: (String) Expiry in RFC 3339 UTC format, or null for a permanent key (including an absent or year-one API expiry).
+            id: (String) Access-key ID. Used for import and individual revocation.
+            org_id: (String) Organization cloud ID reported by the API.
+            principal_name: (String) Principal determined by the authenticated caller.
+            secret_key: (String, Sensitive) Secret returned only at creation. Preserved during refresh; unavailable after import. Sensitive values remain in Terraform state and state backups.
+            status: (String) Read-only API status, such as ACTIVE, EXPIRED, or FULL_SUSPENDED. The provider never changes principal-wide status.
+        importStatements:
+            - |-
+              # Omit duration_seconds in the resource configuration before importing.
+              # Neither the secret nor the original duration can be recovered.
+              terraform import coreweave_object_storage_access_key.example CW_ACCESS_KEY_ID
+    coreweave_object_storage_bucket:
+        subCategory: ""
+        description: Buckets are the primary organizational containers for your data in CoreWeave AI Object Storage. Bucket names must be globally-unique and not begin with cw- or vip-, which are reserved for internal use. Before creation, the provider verifies the complete list of buckets owned by the organization and fails without sending a create request if that inventory cannot be completed; an existing bucket with the requested name must be imported. Learn more about creating buckets https://docs.coreweave.com/products/storage/object-storage/buckets/create-bucket.
+        name: coreweave_object_storage_bucket
+        title: coreweave_object_storage_bucket Resource - coreweave
+        examples:
+            - name: default
+              manifest: |-
+                {
+                  "name": "my-tf-test-bucket",
+                  "tags": {
+                    "foo": "bar"
+                  },
+                  "zone": "US-EAST-04A"
+                }
+        argumentDocs:
+            name: (String) The bucket name. Must be globally unique and must not begin with cw- or vip-.
+            tags: (Map of String) Map of tags to assign to the bucket.
+            zone: (String) The Availability Zone in which the bucket is located.
+        importStatements:
+            - terraform import coreweave_object_storage_bucket.default {{name}}
+    coreweave_object_storage_bucket_inventory:
+        subCategory: ""
+        description: Manages a CoreWeave AI Object Storage bucket inventory configuration. The provider obtains temporary S3 credentials using its configured authentication; no separately managed access-key resource is required. The authenticated identity must have permission to manage inventory configurations on the source bucket and policies on the destination bucket. Learn more about inventory reporting https://docs.coreweave.com/products/storage/object-storage/buckets/inventory-reporting/configure.
+        name: coreweave_object_storage_bucket_inventory
+        title: coreweave_object_storage_bucket_inventory Resource - coreweave
+        examples:
+            - name: default
+              manifest: |-
+                {
+                  "bucket": "${coreweave_object_storage_bucket.source.name}",
+                  "depends_on": [
+                    "${coreweave_object_storage_bucket_policy.inventory_destination}"
+                  ],
+                  "destination": [
+                    {
+                      "bucket": [
+                        {
+                          "bucket_arn": "arn:aws:s3:::${coreweave_object_storage_bucket.destination.name}",
+                          "format": "CSV",
+                          "prefix": "inventory-reports/"
+                        }
+                      ]
+                    }
+                  ],
+                  "enabled": true,
+                  "filter": [
+                    {
+                      "prefix": "logs/"
+                    }
+                  ],
+                  "included_object_versions": "All",
+                  "name": "daily-inventory",
+                  "optional_fields": [
+                    "Size",
+                    "LastModifiedDate",
+                    "LastAccessedDate",
+                    "StorageClass",
+                    "ETag"
+                  ],
+                  "schedule": [
+                    {
+                      "frequency": "Daily"
+                    }
+                  ]
+                }
+              references:
+                bucket: coreweave_object_storage_bucket.source.name
+              dependencies:
+                coreweave_object_storage_bucket.destination: |-
+                    {
+                      "name": "inventory-destination-example",
+                      "zone": "US-EAST-04A"
+                    }
+                coreweave_object_storage_bucket.source: |-
+                    {
+                      "name": "inventory-source-example",
+                      "zone": "US-EAST-04A"
+                    }
+                coreweave_object_storage_bucket_policy.inventory_destination: |-
+                    {
+                      "bucket": "${coreweave_object_storage_bucket.destination.name}",
+                      "policy": "${jsonencode({\n    Version = \"2012-10-17\"\n    Statement = [\n      {\n        Sid    = \"AllowInventoryReports\"\n        Effect = \"Allow\"\n        Principal = {\n          CW = \"arn:aws:iam::static:role/static/inventory\"\n        }\n        Action   = [\"s3:PutObject\", \"s3:AbortMultipartUpload\"]\n        Resource = [\"arn:aws:s3:::${coreweave_object_storage_bucket.destination.name}/inventory-reports/*\"]\n      },\n      {\n        Sid    = \"AllowCallerManageDestination\"\n        Effect = \"Allow\"\n        Principal = {\n          CW = local.caller_principal\n        }\n        Action = [\n          \"s3:ListBucket\",\n          \"s3:GetBucketPolicy\",\n          \"s3:DeleteBucketPolicy\",\n          \"s3:GetBucketLocation\",\n          \"s3:GetBucketTagging\",\n          \"s3:DeleteBucket\",\n        ]\n        Resource = [\"arn:aws:s3:::${coreweave_object_storage_bucket.destination.name}\"]\n      },\n      {\n        Sid    = \"AllowCallerManageReports\"\n        Effect = \"Allow\"\n        Principal = {\n          CW = local.caller_principal\n        }\n        Action   = [\"s3:GetObject\", \"s3:PutObject\", \"s3:DeleteObject\"]\n        Resource = [\"arn:aws:s3:::${coreweave_object_storage_bucket.destination.name}/inventory-reports/*\"]\n      },\n    ]\n  })}"
+                    }
+        argumentDocs:
+            account_id: (String) Account ID of the destination bucket owner.
+            bucket: (String) Name of source bucket to which the inventory configuration applies
+            bucket_arn: (String) ARN of the destination bucket.
+            destination: (Block, Optional) Required. Where the inventory report is written. May be the same bucket as the source. The destination policy must grant the inventory service s3:PutObject and s3:AbortMultipartUpload on report objects. Use depends_on to apply that policy before the inventory configuration. Bucket policies are evaluated after organization policies; requests without a matching bucket grant are implicitly denied even if an organization policy allows them. Include caller permissions for Terraform bucket reads and cleanup, and explicit grants for report readers. The policy resource replaces the entire existing bucket policy, so retain all required statements. s3:PutBucketPolicy itself evaluates organization permissions only. See policy evaluation. (see below for nested schema)
+            enabled: (Boolean) Whether the inventory configuration is enabled. Defaults to true.
+            filter: (Block, Optional) Limits the inventory report to objects matching a prefix. (see below for nested schema)
+            format: '(String) Output format: CSV, TSV, JSON, ORC, or Parquet.'
+            frequency: '(String) How frequently the report is generated: Daily or Weekly.'
+            included_object_versions: '(String) Object versions to include: All includes all versions; Current includes only current versions.'
+            name: (String) Name of the inventory configuration. Must be unique within the bucket.
+            optional_fields: '(Set of String) Additional report fields: Size, LastModifiedDate, LastAccessedDate, StorageClass, ETag, IsMultipartUploaded, EncryptionStatus, ChecksumAlgorithm. Omit to include no additional fields; an empty set is invalid.'
+            prefix: (String) Prefix prepended to the report output path.
+            schedule: (Block, Optional) Required. Schedule for generating the inventory report. (see below for nested schema)
+        importStatements:
+            - terraform import coreweave_object_storage_bucket_inventory.default {{bucket_name}}:{{inventory_name}}
+    coreweave_object_storage_bucket_lifecycle_configuration:
+        subCategory: ""
+        description: Lifecycle configurations automate object management by defining actions applied to objects over time, such as expiring objects after a specified period or transitioning them to different storage tiers. This helps optimize storage costs and maintain data hygiene. Learn more about S3-compatible lifecycle bucket configurations https://docs.coreweave.com/products/storage/object-storage/reference/object-storage-s3#bucket-lifecycles.
+        name: coreweave_object_storage_bucket_lifecycle_configuration
+        title: coreweave_object_storage_bucket_lifecycle_configuration Resource - coreweave
+        examples:
+            - name: default
+              manifest: |-
+                {
+                  "bucket": "${coreweave_object_storage_bucket.default.name}",
+                  "depends_on": [
+                    "${coreweave_object_storage_bucket_versioning.default}"
+                  ],
+                  "rule": [
+                    {
+                      "expiration": [
+                        {
+                          "days": 30
+                        }
+                      ],
+                      "filter": [
+                        {
+                          "and": [
+                            {
+                              "object_size_greater_than": 1000000,
+                              "prefix": "logs/",
+                              "tags": {
+                                "env": "prod"
+                              }
+                            }
+                          ]
+                        }
+                      ],
+                      "id": "cleanup-logs",
+                      "noncurrent_version_expiration": [
+                        {
+                          "newer_noncurrent_versions": 2,
+                          "noncurrent_days": 7
+                        }
+                      ],
+                      "status": "Enabled"
+                    },
+                    {
+                      "abort_incomplete_multipart_upload": [
+                        {
+                          "days_after_initiation": 5
+                        }
+                      ],
+                      "expiration": [
+                        {
+                          "date": "2026-01-01T00:00:00Z"
+                        }
+                      ],
+                      "filter": [
+                        {
+                          "prefix": "traces/"
+                        }
+                      ],
+                      "id": "expire-traces",
+                      "status": "Enabled"
+                    }
+                  ]
+                }
+              references:
+                bucket: coreweave_object_storage_bucket.default.name
+              dependencies:
+                coreweave_object_storage_bucket.default: |-
+                    {
+                      "name": "bucket-lifecycle-example",
+                      "zone": "US-EAST-04A"
+                    }
+                coreweave_object_storage_bucket_versioning.default: |-
+                    {
+                      "bucket": "${coreweave_object_storage_bucket.default.name}",
+                      "versioning_configuration": [
+                        {
+                          "status": "Enabled"
+                        }
+                      ]
+                    }
+        argumentDocs:
+            abort_incomplete_multipart_upload: (Block, Optional) (see below for nested schema)
+            and: (Block, Optional) Configuration block used to apply a logical AND to two or more predicates. The Lifecycle Rule will apply to any object matching all the predicates configured inside the and block. (see below for nested schema)
+            bucket: (String) Name of the bucket to apply lifecycle configuration to
+            date: (String) ISO8601 date when objects expire
+            days: (Number) Number of days after object creation for expiration
+            days_after_initiation: (Number) Days after initiation to abort multipart uploads
+            expiration: (Block, Optional) (see below for nested schema)
+            expired_object_delete_marker: (Boolean) Whether to remove expired delete markers
+            filter: (Block, Optional) (see below for nested schema)
+            id: (String) Unique identifier for the rule
+            key: (String) Tag key filter
+            newer_noncurrent_versions: (Number) Number of noncurrent versions to retain
+            noncurrent_days: (Number) Days after becoming noncurrent before deletion
+            noncurrent_version_expiration: (Block, Optional) (see below for nested schema)
+            noncurrent_version_transition: (Block Set) (see below for nested schema)
+            object_size_greater_than: (Number) Minimum object size (in bytes) to which the rule applies.
+            object_size_less_than: (Number) Maximum object size (in bytes) to which the rule applies.
+            prefix: (String, Deprecated) Deprecated. Object key prefix to which the rule applies. CoreWeave AI Object Storage rejects requests that set this field; use filter.prefix instead.
+            rule: (Block List) One or more lifecycle rule blocks (see below for nested schema)
+            status: '(String) Rule status: Enabled or Disabled'
+            storage_class: (String) Storage class to transition noncurrent objects to
+            tag: (Block, Optional) (see below for nested schema)
+            tags: (Map of String) Map for specifying tag keys and values.
+            transition: (Block Set) (see below for nested schema)
+            value: (String) Tag value filter
+        importStatements:
+            - terraform import coreweave_object_storage_bucket_lifecycle_configuration.default {{bucket_name}}
+    coreweave_object_storage_bucket_policy:
+        subCategory: ""
+        description: Bucket access policies https://docs.coreweave.com/products/storage/object-storage/auth-access/bucket-access/bucket-policies allow you to define precise, S3-compatible access control for one bucket. These are optional, and are evaluated after organization access policies. See Manage Bucket Policies https://docs.coreweave.com/products/storage/object-storage/auth-access/bucket-access/manage-bucket-policies#example-policies for examples and further information.
+        name: coreweave_object_storage_bucket_policy
+        title: coreweave_object_storage_bucket_policy Resource - coreweave
+        examples:
+            - name: raw
+              manifest: |-
+                {
+                  "bucket": "${coreweave_object_storage_bucket.raw.name}",
+                  "policy": "${jsonencode(local.bucket_policy)}"
+                }
+              references:
+                bucket: coreweave_object_storage_bucket.raw.name
+              dependencies:
+                coreweave_object_storage_bucket.doc: |-
+                    {
+                      "name": "bucket-policy-doc-example",
+                      "zone": "US-EAST-04A"
+                    }
+                coreweave_object_storage_bucket.raw: |-
+                    {
+                      "name": "bucket-policy-raw-example",
+                      "zone": "US-EAST-04A"
+                    }
+            - name: doc
+              manifest: |-
+                {
+                  "bucket": "${coreweave_object_storage_bucket.doc.name}",
+                  "policy": "${data.coreweave_object_storage_bucket_policy_document.doc.json}"
+                }
+              references:
+                bucket: coreweave_object_storage_bucket.doc.name
+                policy: data.coreweave_object_storage_bucket_policy_document.doc.json
+              dependencies:
+                coreweave_object_storage_bucket.doc: |-
+                    {
+                      "name": "bucket-policy-doc-example",
+                      "zone": "US-EAST-04A"
+                    }
+                coreweave_object_storage_bucket.raw: |-
+                    {
+                      "name": "bucket-policy-raw-example",
+                      "zone": "US-EAST-04A"
+                    }
+        argumentDocs:
+            bucket: (String) The name of the bucket for which to apply this policy.
+            policy: (String) Text of the policy. Must be valid JSON. The coreweave_object_storage_bucket_policy_document data source may be used, simply reference the .json attribute of the data source.
+        importStatements:
+            - terraform import coreweave_object_storage_bucket_policy.default {{bucket_name}}
+    coreweave_object_storage_bucket_settings:
+        subCategory: ""
+        description: Manage settings for a CoreWeave AI Object Storage bucket.
+        name: coreweave_object_storage_bucket_settings
+        title: coreweave_object_storage_bucket_settings Resource - coreweave
+        examples:
+            - name: default
+              manifest: |-
+                {
+                  "archive_after_last_access_days": 60,
+                  "archive_enabled": true,
+                  "audit_logging_enabled": true,
+                  "bucket": "${coreweave_object_storage_bucket.default.name}",
+                  "capacity_cap_bytes": 1099511627776
+                }
+              references:
+                bucket: coreweave_object_storage_bucket.default.name
+              dependencies:
+                coreweave_object_storage_bucket.default: |-
+                    {
+                      "name": "my-bucket-with-settings",
+                      "zone": "US-EAST-04A"
+                    }
+        argumentDocs:
+            archive_after_last_access_days: (Number) Days since last access (or creation if never accessed) before a STANDARD object version is archived to STANDARD_IA. The default minimum is 60; your organization's entitlement may permit a different minimum, so the effective floor is validated server-side. Required when archive_enabled is true, and rejected otherwise.
+            archive_enabled: (Boolean) When true, idle STANDARD objects are archived to STANDARD_IA after archive_after_last_access_days without access. Your organization must be entitled to configure this setting.
+            audit_logging_enabled: (Boolean) Whether audit logging is enabled for the bucket. Contact support to enable audit logging for your organization before enabling this setting.
+            bucket: (String) The name of the bucket to manage settings for.
+            capacity_cap_bytes: (Number) Maximum number of STANDARD-class bytes the bucket may store. New STANDARD writes are rejected once bucket usage would exceed this cap; 0 is a valid cap that blocks all new STANDARD writes. Omit to leave the cap unchanged. Removing this resource leaves any cap in place; the cap is cleared when the bucket itself is deleted. Your organization must be entitled to configure this setting.
+        importStatements:
+            - terraform import coreweave_object_storage_bucket_settings.default {{bucket_name}}
+    coreweave_object_storage_bucket_versioning:
+        subCategory: ""
+        description: Versioning protects your data by preserving all versions of objects and preventing permanent deletion. When objects are deleted, they are "soft deleted" with delete markers, allowing you to restore previous versions and recover data. After creating a versioned bucket with Terraform, use rclone to manage versioned objects and delete markers https://docs.coreweave.com/products/storage/object-storage/buckets/rclone-versioned-buckets.
+        name: coreweave_object_storage_bucket_versioning
+        title: coreweave_object_storage_bucket_versioning Resource - coreweave
+        examples:
+            - name: default
+              manifest: |-
+                {
+                  "bucket": "${coreweave_object_storage_bucket.default.name}",
+                  "versioning_configuration": [
+                    {
+                      "status": "Enabled"
+                    }
+                  ]
+                }
+              references:
+                bucket: coreweave_object_storage_bucket.default.name
+              dependencies:
+                coreweave_object_storage_bucket.default: |-
+                    {
+                      "name": "bucket-versioning-example",
+                      "zone": "US-EAST-04A"
+                    }
+        argumentDocs:
+            bucket: (String) The bucket on which to enable or suspend versioning.
+            status: '(String) Versioning state of the bucket. Valid values: Enabled, Suspended, or Disabled. Disabled should only be used when creating or importing resources that correspond to unversioned S3 buckets since the S3 API does not allow setting an Enabled/Suspended bucket to Disabled.'
+            versioning_configuration: (Block, Optional) (see below for nested schema)
+        importStatements:
+            - terraform import coreweave_object_storage_bucket_versioning.default {{bucket_name}}
+    coreweave_object_storage_organization_access_policy:
+        subCategory: ""
+        description: Organization access policies https://docs.coreweave.com/products/storage/object-storage/auth-access/organization-policies/about enforce permissions for AI Object Storage across your entire CoreWeave organization, automatically covering every resource, bucket, and user in your account. At least one organization access policy must be in place before you can create a bucket.
+        name: coreweave_object_storage_organization_access_policy
+        title: coreweave_object_storage_organization_access_policy Resource - coreweave
+        examples:
+            - name: test
+              manifest: |-
+                {
+                  "name": "full-s3-api-access",
+                  "statements": [
+                    {
+                      "actions": [
+                        "s3:*",
+                        "cwobject:*"
+                      ],
+                      "effect": "Allow",
+                      "name": "allow-full-s3-api-access-to-all",
+                      "principals": [
+                        "*"
+                      ],
+                      "resources": [
+                        "*"
+                      ]
+                    }
+                  ]
+                }
+        argumentDocs:
+            actions: (Set of String) Defines which operations the policy allows or denies. Organization access policies can include actions from two APIs - S3 (s3:) and AI Object Storage API (cwobject:). You can use wildcards (like s3:* or cwobject:*) to cover multiple actions at once.
+            effect: (String) Must be either Allow or Deny (case-sensitive). Determines whether the statement grants or denies the specified actions on the listed resources for the designated principals. By default, all access is denied.
+            name: (String) The name of the organization access policy, must be unique.
+            principals: (Set of String) Defines which users, roles, or groups the policy applies to. Only short-form identifiers are supported. If you use a full ARN, the policy will fail with an error. See the AI Object Storage documentation for guidelines on defining principals.
+            resources: (Set of String) Defines which resources the policy applies to. See the AI Object Storage documentation for guidelines on defining resources.
+            statements: (Attributes Set) The list of access policy statements associated with this policy. At least one statement is required. (see below for nested schema)
+        importStatements:
+            - terraform import coreweave_object_storage_organization_access_policy.default {{name}}
+    coreweave_sandbox_managed_runner:
+        subCategory: ""
+        description: Manages a CoreWeave Sandbox runner and its required policy through the v1 RunnerManagementService (/v1/sandbox/managedRunners). Requires a server implementing full v1 managed-runner CRUD; the policy-only v1 server cannot provision or fully refresh this resource. Creation and updates record the accepted desired configuration; installation and rollout continue asynchronously and are exposed in computed status attributes. Deletion waits up to 30 minutes for the runner to disappear.
+        name: coreweave_sandbox_managed_runner
+        title: coreweave_sandbox_managed_runner Resource - coreweave
+        examples:
+            - name: development
+              manifest: |-
+                {
+                  "cluster_id": "${var.cluster_id}",
+                  "display_name": "Engineering development",
+                  "policy": {
+                    "constraints": {
+                      "lifecycle": {
+                        "default_lifetime_seconds": 3600
+                      },
+                      "resources": {
+                        "default_cpu": "1",
+                        "default_memory": "2Gi",
+                        "max_cpu": "8",
+                        "max_gpu_count": 0,
+                        "max_memory": "32Gi"
+                      },
+                      "volumes": {
+                        "max_size": "100Gi"
+                      }
+                    },
+                    "display_name": "Development constraints"
+                  },
+                  "runner_group_id": "engineering",
+                  "runner_id": "development",
+                  "spec": {
+                    "data_plane": {
+                      "disabled": true
+                    },
+                    "image_pull": {
+                      "policy": "SANDBOX_IMAGE_PULL_POLICY_ALWAYS"
+                    },
+                    "maintenance_policy": {
+                      "windows": [
+                        {
+                          "cron": "0 2 * * SAT",
+                          "duration_seconds": 3600
+                        }
+                      ]
+                    },
+                    "overrides": {
+                      "resources": {
+                        "cpu_limit": "4",
+                        "cpu_request": "1",
+                        "memory_limit": "8Gi",
+                        "memory_request": "2Gi"
+                      },
+                      "scaling": {
+                        "replicas": 2
+                      }
+                    },
+                    "release_channel": "RELEASE_CHANNEL_STABLE",
+                    "volumes": {
+                      "csi_driver_allowlist": [
+                        "csi.vastdata.com"
+                      ],
+                      "enabled": true
+                    }
+                  },
+                  "zone": "${lower(var.zone)}"
+                }
+              references:
+                cluster_id: var.cluster_id
+        argumentDocs:
+            active_config_version: (String) Configuration version currently running.
+            active_revision: (Number) Revision currently running.
+            advertised_uri: (String) Stable absolute URI returned to direct clients.
+            allow_privileged: (Boolean) Permit privileged containers.
+            allowed_capabilities: (Set of String) Linux capabilities containers may add. Empty permits none beyond defaults.
+            allowed_egress: (Attributes List) Allowed egress envelope. HTTPS hostname wildcard * is permitted here. Select exactly one peer kind per rule. (see below for nested schema)
+            allowed_images: (Set of String) Allowed image references. Empty permits any image within the registry restrictions.
+            allowed_ingress: (Attributes List) Allowed ingress sources for custom-visibility ports. Select exactly one peer kind per rule. (see below for nested schema)
+            allowed_instance_types: (Set of String) Allowed instance types. Empty permits any offered by the runner.
+            allowed_media: (Set of String) Allowed storage media. Empty permits any.
+            allowed_registries: (Set of String) Allowed registry prefixes. Empty permits any registry.
+            allowed_runtime_classes: (Set of String) Runtime classes callers may explicitly select. Empty forbids caller-selected runtime classes. Cannot be combined with runtime_class_mappings.
+            allowed_seccomp_profiles: (Set of String) Permitted seccomp profiles, such as RuntimeDefault or Unconfined.
+            annotations: (Map of String) Service annotations.
+            any: (Boolean) Set to true to select any address-shaped peer.
+            args: (List of String) Ordered runner command-line arguments.
+            autoscaling_enabled: (Boolean) Enable runner autoscaling.
+            base: (String, Sensitive) Runtime defaults and attachments as a JSON object, for example jsonencode({ ... }). Typed constraints belong in constraints. Values are stored in Terraform state.
+            cidr: (Attributes) CIDR range with optional carve-outs. (see below for nested schema)
+            cidrs: (Set of String) Canonical, nonredundant IPv4/IPv6 prefixes (at most 256). Do not include a prefix already covered by another entry. An empty set denies every public source. Omitting the enclosing source_ip_allowlist leaves access unrestricted.
+            cluster_id: (String) CKS cluster UUID. Changing it replaces the runner.
+            cluster_ip: (Attributes) Expose through a ClusterIP service. (see below for nested schema)
+            cluster_name: (String) Cluster display name resolved by the server.
+            connection_status: (String) Observed live connection status.
+            constraints: (Attributes) Typed constraints applied to the resolved sandbox specification. Omitted groups impose no constraint of that kind; individual security allowlists remain fail-closed. (see below for nested schema)
+            control_plane_access: (Attributes) Request-time controls in addition to authentication and tenant authorization. (see below for nested schema)
+            cpu_ceiling: (String) Sum-of-requests CPU ceiling across the sandbox.
+            cpu_limit: (String) CPU limit.
+            cpu_request: (String) CPU request.
+            cpu_runtime_class: (String) Runtime class for CPU sandboxes.
+            create_time: (String) Creation timestamp (RFC 3339).
+            cron: (String) Five-field cron expression in UTC, for example 0 2 * * SAT.
+            csi_driver_allowlist: (Set of String) Allowed CSI drivers. Empty uses the platform default (csi.vastdata.com).
+            custom: (Attributes) Advertise a customer-managed network path. (see below for nested schema)
+            data_plane: (Attributes) Direct sandbox data endpoint. Select exactly one of disabled, cluster_ip, load_balancer, or custom. Certificates are managed by the platform. (see below for nested schema)
+            data_plane_status: (String) Observed direct endpoint state, URI, protocols, and certificate expiry as JSON, or null.
+            default_cpu: (String) Default CPU per container. When a container declares neither requests nor limits, a positive default also sets its CPU limit.
+            default_cpu_runtime_class: (String) Default CPU runtime class. Must fit a nonempty runtime-class allowlist. Cannot be combined with runtime_class_mappings.
+            default_egress: (Attributes List) Egress applied when the sandbox specifies none. HTTPS hostname destinations are not permitted here. Select exactly one peer kind per rule. (see below for nested schema)
+            default_gpu_runtime_class: (String) Default GPU runtime class. Must fit a nonempty runtime-class allowlist. Cannot be combined with runtime_class_mappings.
+            default_ingress: (Attributes List) Ingress applied when the sandbox specifies none. Select exactly one peer kind per rule. (see below for nested schema)
+            default_lifetime_seconds: (Number) Default sandbox lifetime in seconds; zero leaves the platform default. Maximum 30 days.
+            default_memory: (String) Default memory per container. When a container declares neither requests nor limits, a positive default also sets its memory limit.
+            denied_annotation_prefixes: (Set of String) Rejected annotation key prefixes.
+            deny_dns: (Boolean, Deprecated) Deprecated alias for deny_https_hostname_rules. Does not disable DNS resolution.
+            deny_https_hostname_rules: (Boolean) Forbid hostname-based HTTPS egress grants. Does not disable DNS resolution.
+            deployment_spec: (String, Sensitive) Resolved deployment configuration as JSON. Read-only; use spec.overrides to change supported settings.
+            disabled: (Boolean) Set to true to explicitly disable the direct endpoint.
+            display_name: (String) Human-readable runner name.
+            dns_egress: '(String) Outbound DNS traffic ceiling on UDP/TCP port 53. Unspecified permits DNS; DENY requires sandboxes to block it. Independent of hostname-based HTTPS grants. Values: DNS_EGRESS_MODE_ALLOW, DNS_EGRESS_MODE_DENY.'
+            dns_name: (String, Deprecated) Deprecated alias for https_hostname.
+            dns_name_except: (Set of String, Deprecated) Deprecated alias for https_hostname_except.
+            duration_seconds: (Number) Window duration in seconds (60-604800).
+            effect: (String) Taint effect. Empty matches all effects.
+            enabled: (Boolean) Enable the tenant metrics collector.
+            end_port: (Number) Inclusive end port; zero or omitted means a single port.
+            end_time: (String) Exclusive RFC 3339 end timestamp, after start_time.
+            enforce_resource_limits: (Boolean) Require sandboxes to declare both memory and CPU limits.
+            env: (Map of String, Sensitive) Runner environment overrides. Values are stored in Terraform state; use a protected state backend.
+            etag: (String) Opaque policy revision used for optimistic concurrency. A concurrent policy edit fails the apply; refresh the plan before retrying.
+            except: (Set of String) Excluded subranges.
+            exclusions: (Attributes List) One-time periods during which updates cannot start. (see below for nested schema)
+            external_traffic_policy: '(String) External traffic policy. Values: RUNNER_DATA_PLANE_EXTERNAL_TRAFFIC_POLICY_CLUSTER, RUNNER_DATA_PLANE_EXTERNAL_TRAFFIC_POLICY_LOCAL.'
+            gpu_runtime_class: (String) Runtime class for GPU sandboxes.
+            hostname: (String) Endpoint DNS name included in the server certificate. The platform may assign one when empty.
+            https_hostname: (String) Exact HTTPS hostname or a single leftmost wildcard label; * is allowed only in allowed_egress.
+            https_hostname_except: (Set of String) Hostnames excluded from an allowed_egress HTTPS envelope.
+            id: (String) Terraform resource ID, equal to runner_id within the authenticated organization.
+            image: (Attributes) Image restrictions. (see below for nested schema)
+            image_pull: (Attributes) Workload container image pull behavior. (see below for nested schema)
+            install_error: (String) Structured installation failure details as JSON, or null.
+            install_status: (String) Observed installation status.
+            instance: (Attributes) Node instance-type restrictions. (see below for nested schema)
+            key: (String) Taint key.
+            kubernetes_runtime_class_name: (String) Kubernetes RuntimeClass name. Set exactly one of kubernetes_runtime_class_name or node_default.
+            labels: (Map of String) Labels on runner pods.
+            last_heartbeat_time: (String) Last runner heartbeat timestamp (RFC 3339).
+            lifecycle: (Attributes) Lifetime defaults. (see below for nested schema)
+            load_balancer: (Attributes) Expose through an L4 load balancer forwarding mutual TLS to the runner. (see below for nested schema)
+            load_balancer_class: (String) Kubernetes load balancer class.
+            maintenance_policy: (Attributes) Update scheduling in UTC. Exclusions take precedence over windows. (see below for nested schema)
+            max_annotation_count: (Number) Maximum annotations; zero means no limit.
+            max_cpu: (String) Maximum CPU per container, as a Kubernetes quantity.
+            max_gpu_count: (Number) Maximum GPUs per container. Omitted means no cap; explicit zero forbids GPUs.
+            max_memory: (String) Maximum memory per container.
+            max_replicas: (Number) Maximum replicas.
+            max_size: (String) Maximum size per volume, for example 100Gi.
+            memory_ceiling: (String) Sum-of-requests memory ceiling across the sandbox.
+            memory_limit: (String) Memory limit.
+            memory_request: (String) Memory request.
+            metadata: (Attributes) Annotation restrictions. (see below for nested schema)
+            min_cpu: (String) Minimum CPU per container.
+            min_memory: (String) Minimum memory per container.
+            min_replicas: (Number) Minimum replicas.
+            namespace_labels: (Map of String) Namespace labels to match. Omitted means the sandbox's own namespace.
+            network: (Attributes) Network envelopes and defaults. Empty allowed envelopes impose no restriction. (see below for nested schema)
+            node_default: (Boolean) Set to true to use the node's default container runtime. Permitted only for RUNTIME_CLASS_CPU_DEFAULT and RUNTIME_CLASS_GPU_DEFAULT, and only serves CKS-mode placement outside the shared serverless pool.
+            node_selector: (Map of String) Node label selectors for the runner deployment.
+            operator: (String) Toleration operator (Equal or Exists).
+            overrides: (Attributes) Customer-settable runner deployment overrides. (see below for nested schema)
+            pod_labels: (Map of String) Pod labels to match (at least one required).
+            policy: (Attributes) Policy governing every sandbox on this runner. Required even for the explicit empty posture policy = {}. Policy is updated with an etag to detect concurrent changes. (see below for nested schema)
+            port: (Number) Starting port.
+            ports: (Attributes List) Allowed ports. Empty means all ports, except HTTPS hostname destinations which use HTTPS (TCP 443). (see below for nested schema)
+            protocol: (String) TCP (default), UDP, or SCTP.
+            reason: (String) Reason for the exclusion.
+            release_channel: '(String) Automatic update channel. Defaults to stable. Values: RELEASE_CHANNEL_STABLE, RELEASE_CHANNEL_RAPID.'
+            replicas: (Number) Desired replicas when autoscaling is disabled.
+            require_limits: (Boolean) Require every container to have requests and limits after defaults are applied.
+            resources: (Attributes) Per-container bounds, defaults, and whole-sandbox ceilings. (see below for nested schema)
+            rollout_in_progress: (Boolean) Whether a newer desired revision is still rolling out.
+            runner_group_id: (String) Runner group for scheduling affinity. Defaults to default; omitting or setting this attribute to null resets a custom group to default.
+            runner_id: (String) Operator-assigned runner identifier, unique within the authenticated organization. Changing it replaces the runner.
+            runtime_class: '(String) Portable runtime class provided by the target. Values: RUNTIME_CLASS_CPU_DEFAULT, RUNTIME_CLASS_CPU_NESTED_VIRT, RUNTIME_CLASS_CPU_SNAPSHOT_RESTORE, RUNTIME_CLASS_GPU_DEFAULT.'
+            runtime_class_mappings: '(Attributes Set) Bindings from portable runtime classes to concrete runtimes. A non-empty set switches the runner to mappings: a mapped class is available both for caller selection and as the automatic CPU or GPU default, an unmapped class is unavailable, and callers cannot pin a concrete runtime class. Omitting a default class disables automatic selection for that resource family. Each class appears at most once. Cannot be combined with allowed_runtime_classes, default_cpu_runtime_class, or default_gpu_runtime_class. (see below for nested schema)'
+            scaling: (Attributes) Runner replica and autoscaling configuration. (see below for nested schema)
+            scope: '(String) Load balancer scope. Values: RUNNER_DATA_PLANE_SERVICE_SCOPE_PUBLIC, RUNNER_DATA_PLANE_SERVICE_SCOPE_PRIVATE.'
+            security: (Attributes) Container privilege and runtime-class constraints. (see below for nested schema)
+            selector: (Attributes) Explicit entitlement to reach cluster workloads by label. (see below for nested schema)
+            service_annotations: (Map of String) Annotations on the backing ClusterIP service.
+            source_ip_allowlist: (Attributes) Public source IP restriction. A present empty object denies every public source; an absent object imposes no source IP restriction. (see below for nested schema)
+            source_ranges: (Set of String) Allowed client source CIDRs.
+            spec: (Attributes) Desired runner configuration. When omitted, the server's defaults are adopted. Removing an optional setting inside this object resets that setting through an explicit update mask. (see below for nested schema)
+            start_time: (String) Inclusive RFC 3339 start timestamp.
+            target_revision: (Number) Desired deployment revision.
+            tenant: '(String) Relational tenant selection. Values: TENANT_SCOPE_SAME_USER, TENANT_SCOPE_SAME_ORG, TENANT_SCOPE_SANDBOX_NETWORK.'
+            tenant_metrics: (Attributes) Per-sandbox tenant usage collection. Overrides corresponding deployment environment entries. (see below for nested schema)
+            tolerations: (Attributes List) Kubernetes tolerations for runner pods. (see below for nested schema)
+            update_available: (Boolean) Whether a newer version is available on the release channel.
+            update_time: (String) Last configuration update timestamp (RFC 3339).
+            value: (String) Taint value.
+            volumes: (Attributes) Sandbox volume restrictions. (see below for nested schema)
+            windows: (Attributes List) Recurring update windows. An empty list permits updates at any time outside exclusions. (see below for nested schema)
+            zone: (String) Lowercase geographic zone of the runner, for example us-east-04a. Use lower(coreweave_cks_cluster.example.zone) when referencing a CKS cluster zone. Changing it replaces the runner.
+        importStatements:
+            - |-
+              # Import a runner by runner_id within the authenticated organization.
+              terraform import coreweave_sandbox_managed_runner.development development
+    coreweave_workload_federation_oidc_config:
+        subCategory: ""
+        description: Creates and manages an external OpenID Connect (OIDC) trust configuration for CoreWeave workload identity federation.
+        name: coreweave_workload_federation_oidc_config
+        title: coreweave_workload_federation_oidc_config Resource - coreweave
+        examples:
+            - name: example
+              manifest: |-
+                {
+                  "audience": "https://coreweave.com/iam",
+                  "description": "HCP Terraform workload identity",
+                  "issuer_url": "https://app.terraform.io",
+                  "name": "hcp-terraform"
+                }
+        argumentDocs:
+            active: '(Boolean) Whether tokens issued by this OIDC provider are accepted for workload identity federation. Defaults to true when omitted on creation. Once a value has been applied it is retained: removing the attribute from configuration keeps the last applied value rather than reverting to true, so a configuration that was deactivated stays deactivated. Set active = true explicitly to reactivate one.'
+            audience: (String) The expected audience claim in tokens issued by the external OIDC provider.
+            created_at: (String) The RFC 3339 timestamp at which the OIDC configuration was created.
+            deactivated_at: (String) The RFC 3339 timestamp at which the OIDC configuration was deactivated, or null while it is active.
+            description: (String) An optional human-readable description of the OIDC configuration.
+            id: (String) The server-assigned unique identifier for the OIDC configuration.
+            issuer_url: (String) The issuer URL of the external OIDC provider. HTTPS is required except for loopback development issuers.
+            name: (String) A human-readable name for the OIDC configuration. Must contain only letters, numbers, hyphens, and underscores.
+            organization_id: (String) The unique identifier of the CoreWeave organization that owns the OIDC configuration.
+            updated_at: (String) The RFC 3339 timestamp at which the OIDC configuration was last updated.
+        importStatements:
+            - terraform import coreweave_workload_federation_oidc_config.example '<oidc-config-uid>'
