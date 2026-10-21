@@ -63,4 +63,5 @@ var GroupMap = map[string]GroupKindCalculator{
 	"coreweave_container_registry_namespace":                  ReplaceGroupWords("containerregistry", 2),
 	"coreweave_container_registry_access_configuration":       ReplaceGroupWords("containerregistry", 2),
 	"coreweave_container_registry_lifecycle_policy":           ReplaceGroupWords("containerregistry", 2),
+	"coreweave_sandbox_managed_runner":                        ReplaceGroupWords("sandbox", 1),
 }

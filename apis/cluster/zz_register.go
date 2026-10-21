@@ -15,6 +15,7 @@ import (
 	v1beta1inference "github.com/upbound/provider-coreweave/apis/cluster/inference/v1beta1"
 	v1beta1networking "github.com/upbound/provider-coreweave/apis/cluster/networking/v1beta1"
 	v1beta1objectstorage "github.com/upbound/provider-coreweave/apis/cluster/objectstorage/v1beta1"
+	v1beta1sandbox "github.com/upbound/provider-coreweave/apis/cluster/sandbox/v1beta1"
 	v1alpha1 "github.com/upbound/provider-coreweave/apis/cluster/v1alpha1"
 	v1beta1cluster "github.com/upbound/provider-coreweave/apis/cluster/v1beta1"
 	v1beta1workloadfederation "github.com/upbound/provider-coreweave/apis/cluster/workloadfederation/v1beta1"
@@ -28,6 +29,7 @@ func init() {
 		v1beta1inference.SchemeBuilder.AddToScheme,
 		v1beta1networking.SchemeBuilder.AddToScheme,
 		v1beta1objectstorage.SchemeBuilder.AddToScheme,
+		v1beta1sandbox.SchemeBuilder.AddToScheme,
 		v1alpha1.SchemeBuilder.AddToScheme,
 		v1beta1cluster.SchemeBuilder.AddToScheme,
 		v1beta1workloadfederation.SchemeBuilder.AddToScheme,

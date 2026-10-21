@@ -1,0 +1,51 @@
+apiVersion: sandbox.coreweave.upbound.io/v1beta1
+kind: ManagedRunner
+metadata:
+  annotations:
+    meta.upbound.io/example-id: sandbox/v1beta1/managedrunner
+  labels:
+    testing.upbound.io/example-name: development
+  name: development
+spec:
+  forProvider:
+    clusterIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example
+    displayName: Engineering development
+    policy:
+      constraints:
+        lifecycle:
+          defaultLifetimeSeconds: 3600
+        resources:
+          defaultCpu: "1"
+          defaultMemory: 2Gi
+          maxCpu: "8"
+          maxGpuCount: 0
+          maxMemory: 32Gi
+        volumes:
+          maxSize: 100Gi
+      displayName: Development constraints
+    runnerGroupId: engineering
+    spec:
+      dataPlane:
+        disabled: true
+      imagePull:
+        policy: SANDBOX_IMAGE_PULL_POLICY_ALWAYS
+      maintenancePolicy:
+        windows:
+        - cron: 0 2 * * SAT
+          durationSeconds: 3600
+      overrides:
+        resources:
+          cpuLimit: "4"
+          cpuRequest: "1"
+          memoryLimit: 8Gi
+          memoryRequest: 2Gi
+        scaling:
+          replicas: 2
+      releaseChannel: RELEASE_CHANNEL_STABLE
+      volumes:
+        csiDriverAllowlist:
+        - csi.vastdata.com
+        enabled: true
+    zone: ${lower(var.zone)}
