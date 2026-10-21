@@ -57,6 +57,8 @@ var terraformPluginFrameworkExternalNameConfigs = map[string]config.ExternalName
 	"coreweave_container_registry_namespace":            config.TemplatedStringAsIdentifier("name", "namespaces/{{ .external_name }}"),
 	"coreweave_container_registry_access_configuration": config.FrameworkResourceWithComputedIdentifier("id", "namespaces/placeholder/accessConfiguration"),
 	"coreweave_container_registry_lifecycle_policy":     config.FrameworkResourceWithComputedIdentifier("id", "namespaces/placeholder/lifecyclePolicy"),
+	// The managed runner id is the operator-assigned runner_id.
+	"coreweave_sandbox_managed_runner": config.ParameterAsIdentifier("runner_id"),
 }
 
 // frameworkNameAsIdentifier identifies a framework resource that has no id

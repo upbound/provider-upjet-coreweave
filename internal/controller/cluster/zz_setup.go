@@ -26,6 +26,7 @@ import (
 	bucketversioning "github.com/upbound/provider-coreweave/internal/controller/cluster/objectstorage/bucketversioning"
 	organizationaccesspolicy "github.com/upbound/provider-coreweave/internal/controller/cluster/objectstorage/organizationaccesspolicy"
 	providerconfig "github.com/upbound/provider-coreweave/internal/controller/cluster/providerconfig"
+	managedrunner "github.com/upbound/provider-coreweave/internal/controller/cluster/sandbox/managedrunner"
 	oidcconfig "github.com/upbound/provider-coreweave/internal/controller/cluster/workloadfederation/oidcconfig"
 )
 
@@ -50,6 +51,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 		bucketversioning.Setup,
 		organizationaccesspolicy.Setup,
 		providerconfig.Setup,
+		managedrunner.Setup,
 		oidcconfig.Setup,
 	} {
 		if err := setup(mgr, o); err != nil {
@@ -80,6 +82,7 @@ func SetupGated(mgr ctrl.Manager, o controller.Options) error {
 		bucketversioning.SetupGated,
 		organizationaccesspolicy.SetupGated,
 		providerconfig.SetupGated,
+		managedrunner.SetupGated,
 		oidcconfig.SetupGated,
 	} {
 		if err := setup(mgr, o); err != nil {
@@ -109,6 +112,7 @@ func SetupWebhookWithManager(mgr ctrl.Manager) error {
 		bucketversioning.SetupWebhookWithManager,
 		organizationaccesspolicy.SetupWebhookWithManager,
 		providerconfig.SetupWebhookWithManager,
+		managedrunner.SetupWebhookWithManager,
 		oidcconfig.SetupWebhookWithManager,
 	} {
 		if err := setup(mgr); err != nil {

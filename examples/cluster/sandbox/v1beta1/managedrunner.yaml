@@ -1,0 +1,102 @@
+apiVersion: sandbox.coreweave.upbound.io/v1beta1
+kind: ManagedRunner
+metadata:
+  annotations:
+    meta.upbound.io/example-id: sandbox/v1beta1/managedrunner
+  labels:
+    testing.upbound.io/example-name: sandbox-v1beta1-managedrunner
+  name: example-managedrunner
+spec:
+  forProvider:
+    displayName: Example managed runner
+    runnerGroupId: engineering
+    zone: us-east-04a
+    clusterIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: sandbox-v1beta1-managedrunner
+    spec:
+      releaseChannel: RELEASE_CHANNEL_STABLE
+      maintenancePolicy:
+        windows:
+        - cron: 0 2 * * SAT
+          durationSeconds: 3600
+      overrides:
+        resources:
+          cpuRequest: "1"
+          memoryRequest: 2Gi
+          cpuLimit: "4"
+          memoryLimit: 8Gi
+        scaling:
+          replicas: 2
+      imagePull:
+        policy: SANDBOX_IMAGE_PULL_POLICY_ALWAYS
+      volumes:
+        enabled: true
+        csiDriverAllowlist:
+        - csi.vastdata.com
+      dataPlane:
+        disabled: true
+    policy:
+      displayName: Development constraints
+      constraints:
+        resources:
+          defaultCpu: "1"
+          defaultMemory: 2Gi
+          maxCpu: "8"
+          maxMemory: 32Gi
+          maxGpuCount: 0
+        lifecycle:
+          defaultLifetimeSeconds: 3600
+        volumes:
+          maxSize: 100Gi
+
+---
+
+apiVersion: cks.coreweave.upbound.io/v1beta1
+kind: Cluster
+metadata:
+  annotations:
+    meta.upbound.io/example-id: sandbox/v1beta1/managedrunner
+  labels:
+    testing.upbound.io/example-name: sandbox-v1beta1-managedrunner
+  name: example-managedrunner
+spec:
+  forProvider:
+    name: example-managedrunner
+    zone: US-EAST-04A
+    version: v1.35
+    public: false
+    vpcIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: sandbox-v1beta1-managedrunner
+    podCidrName: pod-cidr
+    serviceCidrName: service-cidr
+    internalLbCidrNames:
+    - internal-lb-cidr
+
+---
+
+apiVersion: networking.coreweave.upbound.io/v1beta1
+kind: VPC
+metadata:
+  annotations:
+    meta.upbound.io/example-id: sandbox/v1beta1/managedrunner
+  labels:
+    testing.upbound.io/example-name: sandbox-v1beta1-managedrunner
+  name: example-managedrunner
+spec:
+  forProvider:
+    name: example-managedrunner
+    zone: US-EAST-04A
+    hostPrefixes:
+    - name: primary
+      type: PRIMARY
+      prefixes:
+      - 10.16.192.0/18
+    vpcPrefixes:
+    - name: pod-cidr
+      value: 10.0.0.0/13
+    - name: service-cidr
+      value: 10.16.0.0/22
+    - name: internal-lb-cidr
+      value: 10.32.4.0/22

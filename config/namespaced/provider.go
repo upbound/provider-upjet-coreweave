@@ -9,6 +9,7 @@ import (
 	"github.com/upbound/provider-coreweave/config/namespaced/containerregistry"
 	"github.com/upbound/provider-coreweave/config/namespaced/inference"
 	"github.com/upbound/provider-coreweave/config/namespaced/objectstorage"
+	"github.com/upbound/provider-coreweave/config/namespaced/sandbox"
 )
 
 // Keep this list identical to config/cluster/provider.go.
@@ -17,4 +18,5 @@ func init() {
 	ProviderConfiguration.AddConfig(objectstorage.Configure)
 	ProviderConfiguration.AddConfig(inference.Configure)
 	ProviderConfiguration.AddConfig(containerregistry.Configure)
+	ProviderConfiguration.AddConfig(sandbox.Configure)
 }

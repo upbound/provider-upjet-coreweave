@@ -15,5 +15,6 @@
 "coreweave_object_storage_bucket_settings",
 "coreweave_object_storage_bucket_versioning",
 "coreweave_object_storage_organization_access_policy",
+"coreweave_sandbox_managed_runner",
 "coreweave_workload_federation_oidc_config"
 ]
