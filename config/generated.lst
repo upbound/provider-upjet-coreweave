@@ -1,5 +1,8 @@
 [
 "coreweave_cks_cluster",
+"coreweave_inference_capacity_claim",
+"coreweave_inference_deployment",
+"coreweave_inference_gateway",
 "coreweave_networking_vpc",
 "coreweave_object_storage_access_key",
 "coreweave_object_storage_bucket",

@@ -6,6 +6,7 @@ package cluster
 
 import (
 	"github.com/upbound/provider-coreweave/config/cluster/cks"
+	"github.com/upbound/provider-coreweave/config/cluster/inference"
 	"github.com/upbound/provider-coreweave/config/cluster/objectstorage"
 )
 
@@ -13,4 +14,5 @@ import (
 func init() {
 	ProviderConfiguration.AddConfig(cks.Configure)
 	ProviderConfiguration.AddConfig(objectstorage.Configure)
+	ProviderConfiguration.AddConfig(inference.Configure)
 }

@@ -1,0 +1,38 @@
+apiVersion: inference.coreweave.m.upbound.io/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    meta.upbound.io/example-id: inference/v1beta1/deployment
+  labels:
+    testing.upbound.io/example-name: example
+  name: example
+  namespace: upbound-system
+spec:
+  forProvider:
+    autoscaling:
+      capacityClasses:
+      - CAPACITY_CLASS_RESERVED
+      - CAPACITY_CLASS_ON_DEMAND
+      concurrency: 16
+      max: 4
+      min: 1
+      priority: 100
+    gatewayIdsRefs:
+    - name: coreweave_inference_deployment_parameters
+    model:
+      bucket: my-model-bucket
+      name: meta-llama/Llama-3.1-8B
+      path: models/llama-3.1-8b
+    name: my-llm
+    resources:
+      gpuCount: 1
+      instanceType: H100_80GB_SXM5
+    runtime:
+      engine: vllm
+      engineConfig:
+        max-model-len: "8192"
+      engineEnv:
+        VLLM_USE_FLASHINFER_MOE_FP4: "0"
+      version: 0.8.5
+    traffic:
+      weight: 100

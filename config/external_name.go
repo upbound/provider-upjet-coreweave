@@ -45,6 +45,9 @@ var terraformPluginFrameworkExternalNameConfigs = map[string]config.ExternalName
 	"coreweave_object_storage_bucket_versioning":              externalNameFromArguments("bucket"),
 	"coreweave_object_storage_access_key":                     config.FrameworkResourceWithComputedIdentifier("id", nilUUID),
 	"coreweave_object_storage_organization_access_policy":     frameworkNameAsIdentifier(),
+	"coreweave_inference_capacity_claim":                      config.FrameworkResourceWithComputedIdentifier("id", nilUUID),
+	"coreweave_inference_deployment":                          config.FrameworkResourceWithComputedIdentifier("id", nilUUID),
+	"coreweave_inference_gateway":                             config.FrameworkResourceWithComputedIdentifier("id", nilUUID),
 }
 
 // frameworkNameAsIdentifier identifies a framework resource that has no id
