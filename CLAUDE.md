@@ -49,6 +49,43 @@ can quickly find the files and configuration involved in common tasks
   `.m.upbound.io`). Configuration is mirrored under `config/cluster/` and
   `config/namespaced/`.
 
+## API groups
+
+Groups follow the upstream service prefixes with the underscores removed;
+kinds are the remaining words of the Terraform resource name, with
+initialisms kept upper-case (`VPC`, `OIDCConfig`).
+
+| API group            | Kinds                                                                                                                                | Terraform resources                        |
+|----------------------|--------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------|
+| `cks`                | Cluster                                                                                                                              | `coreweave_cks_cluster`                    |
+| `containerregistry`  | Namespace, AccessConfiguration, LifecyclePolicy                                                                                      | `coreweave_container_registry_*`           |
+| `inference`          | CapacityClaim, Deployment, Gateway                                                                                                   | `coreweave_inference_*`                    |
+| `networking`         | VPC                                                                                                                                  | `coreweave_networking_vpc`                 |
+| `objectstorage`      | Bucket, BucketInventory, BucketLifecycleConfiguration, BucketPolicy, BucketSettings, BucketVersioning, AccessKey, OrganizationAccessPolicy | `coreweave_object_storage_*`               |
+| `sandbox`            | ManagedRunner                                                                                                                        | `coreweave_sandbox_managed_runner`         |
+| `workloadfederation` | OIDCConfig                                                                                                                           | `coreweave_workload_federation_oidc_config` |
+
+External names, by the shape of the upstream identifier
+(`config/external_name.go`):
+
+- **Server-assigned UUID `id`** (Cluster, CapacityClaim, Deployment, Gateway,
+  OIDCConfig, VPC, AccessKey): `FrameworkResourceWithComputedIdentifier` with
+  the nil UUID as the pre-creation placeholder.
+- **No `id` attribute, identified by `name`** (Bucket, OrganizationAccessPolicy):
+  `frameworkNameAsIdentifier`, so `name` is the external name and is not a
+  spec field.
+- **No `id` attribute, identified by the bucket** (BucketInventory also by its
+  own `name`): `externalNameFromArguments`; the external name is assigned after
+  creation in the upstream import format, so `bucket` stays a referenceable
+  spec field.
+- **Canonical API names** (`namespaces/<name>` and its `/accessConfiguration`
+  and `/lifecyclePolicy` singletons): Namespace uses
+  `TemplatedStringAsIdentifier` with the namespace name as external name; the
+  singletons take the canonical name after the first read and keep `namespace`
+  referenceable.
+- **Operator-assigned id** (ManagedRunner): `ParameterAsIdentifier("runner_id")`,
+  so the external name is the runner id.
+
 ## Directory layout
 
 ```
