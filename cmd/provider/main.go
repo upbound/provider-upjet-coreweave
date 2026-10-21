@@ -35,7 +35,9 @@ import (
 	"github.com/crossplane/crossplane-runtime/v2/pkg/logging"
 	"github.com/crossplane/crossplane-runtime/v2/pkg/ratelimiter"
 	"github.com/crossplane/crossplane-runtime/v2/pkg/reconciler/customresourcesgate"
+	ujconfig "github.com/crossplane/upjet/v2/pkg/config"
 	tjcontroller "github.com/crossplane/upjet/v2/pkg/controller"
+	"github.com/crossplane/upjet/v2/pkg/diffserver"
 
 	clusterapis "github.com/upbound/provider-coreweave/apis/cluster"
 	namespacedapis "github.com/upbound/provider-coreweave/apis/namespaced"
@@ -77,9 +79,19 @@ func main() {
 			certsDirSet = true
 			return nil
 		}).String()
+
+		// Running the provider's controllers is the default command, so that
+		// the provider keeps behaving as it did before the internal commands
+		// were introduced, when it is invoked without any arguments.
+		startCmd = app.Command("start", "Start the provider's controllers.").Default()
+
+		internalCmd   = app.Command("internal", "Commands used internally by the Crossplane ecosystem. No compatibility guarantees are made for them.")
+		diffServerCmd = internalCmd.Command("diff-server", "Start a gRPC server serving the provider's diff services. It never contacts the CoreWeave API or a cluster: plans are computed offline from the resources in each request.")
+		diffNetwork   = diffServerCmd.Flag("network", "The network the diff gRPC server listens on.").Default("tcp").Envar("DIFF_SERVER_NETWORK").Enum("tcp", "unix")
+		diffAddress   = diffServerCmd.Flag("address", "The address the diff gRPC server listens on. A socket path when the network is unix.").Default(":9099").Envar("DIFF_SERVER_ADDRESS").String()
 	)
 
-	kingpin.MustParse(app.Parse(os.Args[1:]))
+	cmd := kingpin.MustParse(app.Parse(os.Args[1:]))
 	log.Default().SetOutput(io.Discard)
 
 	zl := zap.New(zap.UseDevMode(*debug))
@@ -94,6 +106,24 @@ func main() {
 		// trace and discards its logs anyway. Give it one that writes nowhere
 		// unless we are running in debug mode.
 		ctrl.SetLogger(zap.New(zap.WriteTo(io.Discard)))
+	}
+
+	ctx := context.Background()
+	clusterProvider, err := config.GetProvider(ctx)
+	kingpin.FatalIfError(err, "Cannot initialize the cluster-scoped provider configuration")
+	namespacedProvider, err := config.GetProviderNamespaced(ctx)
+	kingpin.FatalIfError(err, "Cannot initialize the namespaced provider configuration")
+
+	switch cmd {
+	case diffServerCmd.FullCommand():
+		// Dispatched before a cluster connection (ctrl.GetConfig and the
+		// manager below) becomes a requirement for running this binary at
+		// all: the diff server serves from the resources in each request and
+		// never talks to a cluster or to the CoreWeave API.
+		kingpin.FatalIfError(serveDiffServer(ctrl.SetupSignalHandler(), log, *diffNetwork, *diffAddress, clusterProvider, namespacedProvider), "Cannot run the diff gRPC server")
+		return
+	case startCmd.FullCommand():
+		// The provider's controllers are started below.
 	}
 
 	// currently, we configure the jitter to be the 5% of the poll interval
@@ -167,12 +197,6 @@ func main() {
 	if len(*certsDir) > 0 {
 		kingpin.FatalIfError(mgr.AddReadyzCheck("webhook", mgr.GetWebhookServer().StartedChecker()), "Cannot add webhook server readyz checker to controller manager")
 	}
-
-	ctx := context.Background()
-	clusterProvider, err := config.GetProvider(ctx)
-	kingpin.FatalIfError(err, "Cannot initialize the cluster-scoped provider configuration")
-	namespacedProvider, err := config.GetProviderNamespaced(ctx)
-	kingpin.FatalIfError(err, "Cannot initialize the namespaced provider configuration")
 
 	clusterOpts := tjcontroller.Options{
 		Options: xpcontroller.Options{
@@ -255,4 +279,40 @@ func canWatchCRD(ctx context.Context, mgr manager.Manager) (bool, error) {
 		}
 	}
 	return true, nil
+}
+
+// serveDiffServer runs the diff gRPC server on the given network and address
+// until the context is cancelled.
+func serveDiffServer(ctx context.Context, log logging.Logger, network, address string, providers ...*ujconfig.Provider) error {
+	s, scheme, err := newDiffServer(log, providers...)
+	if err != nil {
+		return err
+	}
+	return s.Serve(ctx, network, address, scheme)
+}
+
+// newDiffServer returns the diff gRPC server, wired to compute plans offline,
+// and the runtime scheme it decodes plan requests with. The scheme holds the
+// provider's own APIs and the Kubernetes core API, which is all a request can
+// carry: the server never talks to a cluster.
+func newDiffServer(log logging.Logger, providers ...*ujconfig.Provider) (*diffserver.Server, *runtime.Scheme, error) {
+	scheme := runtime.NewScheme()
+	if err := clientgoscheme.AddToScheme(scheme); err != nil {
+		return nil, nil, errors.Wrap(err, "cannot add Kubernetes core APIs to the diff server scheme")
+	}
+	if err := clusterapis.AddToScheme(scheme); err != nil {
+		return nil, nil, errors.Wrap(err, "cannot add cluster-scoped CoreWeave APIs to the diff server scheme")
+	}
+	if err := namespacedapis.AddToScheme(scheme); err != nil {
+		return nil, nil, errors.Wrap(err, "cannot add namespaced CoreWeave APIs to the diff server scheme")
+	}
+	if len(providers) == 0 {
+		return nil, nil, errors.New("at least one provider configuration is required")
+	}
+	s := diffserver.NewServer(
+		diffserver.WithProviderConfigurations(providers...),
+		diffserver.WithLogger(log),
+		diffserver.WithTerraformSetupFn(clients.OfflineTerraformSetupBuilder(providers[0].TerraformPluginFrameworkProvider)),
+	)
+	return s, scheme, nil
 }
