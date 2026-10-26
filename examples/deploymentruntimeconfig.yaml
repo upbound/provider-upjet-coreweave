@@ -7,7 +7,7 @@ spec:
     spec:
       selector: {}
       strategy: {}
-      coreweave:
+      template:
         spec:
           containers:
             - name: package-runtime
