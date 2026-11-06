@@ -3,6 +3,7 @@ kind: Cluster
 metadata:
   annotations:
     meta.upbound.io/example-id: cks/v1beta1/cluster
+    uptest.upbound.io/timeout: "7200"
   labels:
     testing.upbound.io/example-name: cks-v1beta1-cluster
   name: example-cluster
