@@ -3,6 +3,7 @@ kind: CapacityClaim
 metadata:
   annotations:
     meta.upbound.io/example-id: inference/v1beta1/capacityclaim
+    uptest.upbound.io/timeout: "7200"
   labels:
     testing.upbound.io/example-name: inference-v1beta1-capacityclaim
   name: example-capacityclaim
@@ -12,7 +13,7 @@ spec:
     name: example-capacityclaim
     resources:
       capacityType: CAPACITY_TYPE_MANAGED
-      instanceType: h100-80gb-sxm5
-      instanceCount: 2
+      instanceType: rtxp6000-8x
+      instanceCount: 1
       zones:
       - US-EAST-04A
