@@ -23,13 +23,13 @@ spec:
       - 2601:db8:bbbb::/48
       ipam:
         prefixLength: 80
-        gatewayAddressPolicy: FIRST_IP
     - name: attached-network
       type: ATTACHED
       prefixes:
       - 2601:db8:cccc::/48
       ipam:
         prefixLength: 64
+        gatewayAddressPolicy: FIRST_IP
     vpcPrefixes:
     - name: pod-cidr
       value: 10.0.0.0/13
