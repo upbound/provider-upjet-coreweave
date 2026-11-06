@@ -58,6 +58,7 @@ kind: Cluster
 metadata:
   annotations:
     meta.upbound.io/example-id: sandbox/v1beta1/managedrunner
+    uptest.upbound.io/timeout: "7200"
   labels:
     testing.upbound.io/example-name: sandbox-v1beta1-managedrunner
   name: example-managedrunner
