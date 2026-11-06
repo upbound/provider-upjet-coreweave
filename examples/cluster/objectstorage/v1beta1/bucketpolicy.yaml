@@ -1,0 +1,46 @@
+apiVersion: objectstorage.coreweave.upbound.io/v1beta1
+kind: BucketPolicy
+metadata:
+  annotations:
+    meta.upbound.io/example-id: objectstorage/v1beta1/bucketpolicy
+  labels:
+    testing.upbound.io/example-name: objectstorage-v1beta1-bucketpolicy
+  name: example-bucketpolicy
+spec:
+  forProvider:
+    bucketSelector:
+      matchLabels:
+        testing.upbound.io/example-name: objectstorage-v1beta1-bucketpolicy
+    policy: |
+      {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Sid": "allow-all",
+            "Effect": "Allow",
+            "Principal": {
+              "CW": "*"
+            },
+            "Action": [
+              "s3:*"
+            ],
+            "Resource": [
+              "arn:aws:s3:::example-bucketpolicy"
+            ]
+          }
+        ]
+      }
+
+---
+
+apiVersion: objectstorage.coreweave.upbound.io/v1beta1
+kind: Bucket
+metadata:
+  annotations:
+    meta.upbound.io/example-id: objectstorage/v1beta1/bucketpolicy
+  labels:
+    testing.upbound.io/example-name: objectstorage-v1beta1-bucketpolicy
+  name: example-bucketpolicy
+spec:
+  forProvider:
+    zone: US-EAST-04A

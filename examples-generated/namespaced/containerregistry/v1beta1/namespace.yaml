@@ -1,0 +1,17 @@
+apiVersion: containerregistry.coreweave.m.upbound.io/v1beta1
+kind: Namespace
+metadata:
+  annotations:
+    meta.upbound.io/example-id: containerregistry/v1beta1/namespace
+  labels:
+    testing.upbound.io/example-name: images
+  name: images
+  namespace: upbound-system
+spec:
+  forProvider:
+    forceDestroy: false
+    storageQuotaBytes: 107374182400
+    timeouts:
+      create: 30m
+      delete: 30m
+    zone: US-LAB-01A

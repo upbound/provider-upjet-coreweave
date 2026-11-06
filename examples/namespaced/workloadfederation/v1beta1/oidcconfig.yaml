@@ -1,0 +1,15 @@
+apiVersion: workloadfederation.coreweave.m.upbound.io/v1beta1
+kind: OIDCConfig
+metadata:
+  annotations:
+    meta.upbound.io/example-id: workloadfederation/v1beta1/oidcconfig
+  labels:
+    testing.upbound.io/example-name: workloadfederation-v1beta1-oidcconfig
+  name: example-oidcconfig
+  namespace: upbound-system
+spec:
+  forProvider:
+    name: example-oidcconfig
+    description: HCP Terraform workload identity
+    issuerUrl: https://app.terraform.io
+    audience: https://coreweave.com/iam

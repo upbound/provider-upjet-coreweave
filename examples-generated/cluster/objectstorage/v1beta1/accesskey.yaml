@@ -1,0 +1,13 @@
+apiVersion: objectstorage.coreweave.upbound.io/v1beta1
+kind: AccessKey
+metadata:
+  annotations:
+    meta.upbound.io/example-id: objectstorage/v1beta1/accesskey
+  labels:
+    testing.upbound.io/example-name: example
+  name: example
+spec:
+  forProvider:
+    attributes:
+      application: training
+    durationSeconds: 0

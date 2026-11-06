@@ -24,13 +24,14 @@ import (
 
 const (
 	// error messages
-	errNoProviderConfig     = "no providerConfigRef provided"
-	errGetProviderConfig    = "cannot get referenced ProviderConfig"
-	errTrackUsage           = "cannot track ProviderConfig usage"
-	errExtractCredentials   = "cannot extract credentials"
-	errUnmarshalCredentials = "cannot unmarshal coreweave credentials as JSON"
-	errBuildConfiguration   = "cannot build the CoreWeave provider configuration"
-	errConfigureSDKProvider = "cannot configure the CoreWeave SDKv2 provider"
+	errResolveProviderConfig = "cannot resolve provider config"
+	errNoProviderConfig      = "no providerConfigRef provided"
+	errGetProviderConfig     = "cannot get referenced ProviderConfig"
+	errTrackUsage            = "cannot track ProviderConfig usage"
+	errExtractCredentials    = "cannot extract credentials"
+	errUnmarshalCredentials  = "cannot unmarshal coreweave credentials as JSON"
+	errBuildConfiguration    = "cannot build the CoreWeave provider configuration"
+	errConfigureSDKProvider  = "cannot configure the CoreWeave SDKv2 provider"
 
 	// arguments of the upstream provider configuration block
 	keyToken       = "token"
@@ -52,7 +53,7 @@ func TerraformSetupBuilder(sdkProvider *schema.Provider, fwProvider fwprovider.P
 	return func(ctx context.Context, client client.Client, mg resource.Managed) (terraform.Setup, error) {
 		pcSpec, err := resolveProviderConfig(ctx, client, mg)
 		if err != nil {
-			return terraform.Setup{}, errors.Wrap(err, "cannot resolve provider config")
+			return terraform.Setup{}, errors.Wrap(err, errResolveProviderConfig)
 		}
 
 		data, err := resource.CommonCredentialExtractor(ctx, pcSpec.Credentials.Source, client, pcSpec.Credentials.CommonCredentialSelectors)
@@ -210,8 +211,15 @@ func resolveModern(ctx context.Context, crClient client.Client, mg resource.Mode
 		return nil, errors.New("runtime object is not a client.Object")
 	}
 
-	// Namespace will be ignored if the PC is a cluster-scoped type
-	if err := crClient.Get(ctx, types.NamespacedName{Name: configRef.Name, Namespace: mg.GetNamespace()}, pcObj); err != nil {
+	// A ClusterProviderConfig is cluster-scoped. The API server ignores a
+	// namespace on its lookup, but the diff server reads it from an in-memory
+	// store keyed on the exact namespace, so it must be cleared here rather
+	// than left to the client.
+	ns := mg.GetNamespace()
+	if configRef.Kind == namespacedv1beta1.ClusterProviderConfigKind {
+		ns = ""
+	}
+	if err := crClient.Get(ctx, types.NamespacedName{Name: configRef.Name, Namespace: ns}, pcObj); err != nil {
 		return nil, errors.Wrap(err, errGetProviderConfig)
 	}
 

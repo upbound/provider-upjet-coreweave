@@ -1,0 +1,42 @@
+apiVersion: objectstorage.coreweave.upbound.io/v1beta1
+kind: BucketPolicy
+metadata:
+  annotations:
+    meta.upbound.io/example-id: objectstorage/v1beta1/bucketpolicy
+  labels:
+    testing.upbound.io/example-name: raw
+  name: raw
+spec:
+  forProvider:
+    bucketSelector:
+      matchLabels:
+        testing.upbound.io/example-name: raw
+    policy: ${jsonencode(local.bucket_policy)}
+
+---
+
+apiVersion: objectstorage.coreweave.upbound.io/v1beta1
+kind: Bucket
+metadata:
+  annotations:
+    meta.upbound.io/example-id: objectstorage/v1beta1/bucketpolicy
+  labels:
+    testing.upbound.io/example-name: doc
+  name: doc
+spec:
+  forProvider:
+    zone: US-EAST-04A
+
+---
+
+apiVersion: objectstorage.coreweave.upbound.io/v1beta1
+kind: Bucket
+metadata:
+  annotations:
+    meta.upbound.io/example-id: objectstorage/v1beta1/bucketpolicy
+  labels:
+    testing.upbound.io/example-name: raw
+  name: raw
+spec:
+  forProvider:
+    zone: US-EAST-04A

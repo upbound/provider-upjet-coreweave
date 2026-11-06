@@ -46,5 +46,22 @@ func KnownGroupKind(group, kind string) GroupKindCalculator {
 // Without an entry, upjet derives the group from the first word after the
 // resource prefix and the kind from the rest.
 var GroupMap = map[string]GroupKindCalculator{
-	"coreweave_networking_vpc": KnownGroupKind("networking", "VPC"),
+	"coreweave_networking_vpc":                                KnownGroupKind("networking", "VPC"),
+	"coreweave_cks_cluster":                                   ReplaceGroupWords("cks", 1),
+	"coreweave_object_storage_bucket":                         ReplaceGroupWords("objectstorage", 2),
+	"coreweave_object_storage_bucket_inventory":               ReplaceGroupWords("objectstorage", 2),
+	"coreweave_object_storage_bucket_lifecycle_configuration": ReplaceGroupWords("objectstorage", 2),
+	"coreweave_object_storage_bucket_policy":                  ReplaceGroupWords("objectstorage", 2),
+	"coreweave_object_storage_bucket_settings":                ReplaceGroupWords("objectstorage", 2),
+	"coreweave_object_storage_bucket_versioning":              ReplaceGroupWords("objectstorage", 2),
+	"coreweave_object_storage_access_key":                     ReplaceGroupWords("objectstorage", 2),
+	"coreweave_object_storage_organization_access_policy":     ReplaceGroupWords("objectstorage", 2),
+	"coreweave_inference_capacity_claim":                      ReplaceGroupWords("inference", 1),
+	"coreweave_inference_deployment":                          ReplaceGroupWords("inference", 1),
+	"coreweave_inference_gateway":                             ReplaceGroupWords("inference", 1),
+	"coreweave_workload_federation_oidc_config":               KnownGroupKind("workloadfederation", "OIDCConfig"),
+	"coreweave_container_registry_namespace":                  ReplaceGroupWords("containerregistry", 2),
+	"coreweave_container_registry_access_configuration":       ReplaceGroupWords("containerregistry", 2),
+	"coreweave_container_registry_lifecycle_policy":           ReplaceGroupWords("containerregistry", 2),
+	"coreweave_sandbox_managed_runner":                        ReplaceGroupWords("sandbox", 1),
 }

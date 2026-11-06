@@ -1,0 +1,13 @@
+apiVersion: containerregistry.coreweave.upbound.io/v1beta1
+kind: Namespace
+metadata:
+  annotations:
+    meta.upbound.io/example-id: containerregistry/v1beta1/namespace
+  labels:
+    testing.upbound.io/example-name: containerregistry-v1beta1-namespace
+  name: example-namespace
+spec:
+  forProvider:
+    zone: US-LAB-01A
+    storageQuotaBytes: 107374182400
+    forceDestroy: false
