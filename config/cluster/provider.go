@@ -8,6 +8,7 @@ import (
 	"github.com/upbound/provider-coreweave/config/cluster/cks"
 	"github.com/upbound/provider-coreweave/config/cluster/containerregistry"
 	"github.com/upbound/provider-coreweave/config/cluster/inference"
+	"github.com/upbound/provider-coreweave/config/cluster/networking"
 	"github.com/upbound/provider-coreweave/config/cluster/objectstorage"
 	"github.com/upbound/provider-coreweave/config/cluster/sandbox"
 )
@@ -19,4 +20,5 @@ func init() {
 	ProviderConfiguration.AddConfig(inference.Configure)
 	ProviderConfiguration.AddConfig(containerregistry.Configure)
 	ProviderConfiguration.AddConfig(sandbox.Configure)
+	ProviderConfiguration.AddConfig(networking.Configure)
 }
