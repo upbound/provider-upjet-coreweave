@@ -11,3 +11,6 @@ spec:
     durationSeconds: 0
     attributes:
       application: training
+  writeConnectionSecretToRef:
+    name: example-accesskey
+    namespace: upbound-system

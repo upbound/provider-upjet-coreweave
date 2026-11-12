@@ -3,6 +3,7 @@ kind: ManagedRunner
 metadata:
   annotations:
     meta.upbound.io/example-id: sandbox/v1beta1/managedrunner
+    upjet.upbound.io/manual-intervention: "Requires a NodePool to exist in the target cluster, which cannot be provisioned without provider-kubernetes. Test manually by deploying this manifest and creating a NodePool in the example-managedrunner cluster"
   labels:
     testing.upbound.io/example-name: sandbox-v1beta1-managedrunner
   name: example-managedrunner
@@ -58,6 +59,7 @@ kind: Cluster
 metadata:
   annotations:
     meta.upbound.io/example-id: sandbox/v1beta1/managedrunner
+    uptest.upbound.io/timeout: "7200"
   labels:
     testing.upbound.io/example-name: sandbox-v1beta1-managedrunner
   name: example-managedrunner

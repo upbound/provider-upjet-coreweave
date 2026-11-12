@@ -8,6 +8,7 @@ import (
 	"github.com/upbound/provider-coreweave/config/namespaced/cks"
 	"github.com/upbound/provider-coreweave/config/namespaced/containerregistry"
 	"github.com/upbound/provider-coreweave/config/namespaced/inference"
+	"github.com/upbound/provider-coreweave/config/namespaced/networking"
 	"github.com/upbound/provider-coreweave/config/namespaced/objectstorage"
 	"github.com/upbound/provider-coreweave/config/namespaced/sandbox"
 )
@@ -19,4 +20,5 @@ func init() {
 	ProviderConfiguration.AddConfig(inference.Configure)
 	ProviderConfiguration.AddConfig(containerregistry.Configure)
 	ProviderConfiguration.AddConfig(sandbox.Configure)
+	ProviderConfiguration.AddConfig(networking.Configure)
 }

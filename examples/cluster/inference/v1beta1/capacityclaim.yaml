@@ -3,6 +3,7 @@ kind: CapacityClaim
 metadata:
   annotations:
     meta.upbound.io/example-id: inference/v1beta1/capacityclaim
+    upjet.upbound.io/manual-intervention: "Requires a capacity to exist with the correct instance and zone. There's rarely any capacity for GPUs, which leads to test flakiness. Test manually using CoreWeave's Capacity finder to check for valid instance/zone pair"
   labels:
     testing.upbound.io/example-name: inference-v1beta1-capacityclaim
   name: example-capacityclaim
@@ -11,7 +12,7 @@ spec:
     name: example-capacityclaim
     resources:
       capacityType: CAPACITY_TYPE_MANAGED
-      instanceType: h100-80gb-sxm5
-      instanceCount: 2
+      instanceType: rtxp6000-8x
+      instanceCount: 1
       zones:
       - US-EAST-04A
